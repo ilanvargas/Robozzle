@@ -23,31 +23,25 @@ function isEmpty<T>(aList: List<T>): boolean {
 // Returns first element of list
 // PRECOND: list is not empty
 function head<T>(aList: List<T>): T {
-    return aList.car as { car: T, cdr: List<T> };
+    return (aList as PointedPair<T, List<T>>).car;
 }
 
 // Returns tail of the list
 // PRECOND: list is not empty
 function tail<T>(aList: List<T>): List<T> {
-    return aList.cdr as PointedPair<T, List<T>>;
+    return (aList as PointedPair<T, List<T>>).cdr;
 }
 
 // Converts list to string
 // Usefull for tests
 function list2String<T>(aList: List<T>): string {
-  if (isEmpty(aList))
-    return ""
-  else
-    head(aList).toString.concat(list2String(tail(aList)));
+  function list2StringInt<T>(aList: List<T>): string {
+    if (isEmpty(aList))
+      return "nil";
+    else
+      return `${head(aList)}, ${list2StringInt(tail(aList))}`;
+  }
+  return `(|${list2StringInt(aList)}|)`;
 }
 
-const l = cons(1, cons(2, cons(3, nil)));
-console.log(list2String(l));
-
-export { List, 
-  nil, 
-  cons, 
-  isEmpty, 
-  head, 
-  tail,
-  list2String};
+export { List, nil, cons, isEmpty, head, tail, list2String };
