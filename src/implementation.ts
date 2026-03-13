@@ -1,12 +1,12 @@
 //Characteristic of the Robot
-type Robot = {
+interface Robot {
     Col : number;
     Row : number;
-    Dir : number
+    Dir : number;
 }
 
 // Puzzle
-type Puzzle = {
+interface Puzzle {
     id : number;
     title : string;
     about : string;
@@ -15,16 +15,18 @@ type Puzzle = {
     robotDir : number;
     subs : number[];
     allowedCommands : number;
-    board : string
+    board : string;
 }
 
 //Enumeration of the direction
 enum Dir {
-    EST,
+    EST=0,
     SUD,
     WEST,
     NORD,
-    NONE
+    NONE,
 };
+
+// function change_dir(R : )
 
 
