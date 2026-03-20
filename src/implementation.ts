@@ -18,14 +18,6 @@ interface Puzzle {
     board : string;
 }
 
-//Enumeration of the direction
-enum Dir {
-    EST=0,
-    SUD,
-    WEST,
-    NORD,
-    NONE,
-};
 
 // function change_dir(R : )
 
