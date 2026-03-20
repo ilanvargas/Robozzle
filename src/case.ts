@@ -1,4 +1,4 @@
-import { Color, Position, Dir } from "#dist/src/puzzle.js"
+import { Color, Position, Dir } from "./puzzle"
 
 interface Node {
     isStar : boolean;
