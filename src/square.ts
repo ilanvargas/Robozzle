@@ -20,16 +20,14 @@ type Square = undefined | {
 // Represents the end of the board
 const out = undefined;
 
-// Function to manipulate the squares
+// Attributes functions
 
 function isFellOff(aSquare: Square): boolean {
   return aSquare === out;
 }
 
-// PRECOND: The robot is on the board
-
-function move2Square(aSquare: Square, aDir: Dir): Square {
-  return (aSquare as Edge<Square>).vertices[aDir];
+function squareColor(aSquare: Square): Color {
+  return aSquare.color;
 }
 
 function isStar(aSquare: Square): boolean {
@@ -40,4 +38,14 @@ function squarePos(aSquare: Square): Pos {
   return (aSquare as Edge<Square>).position;
 }
 
-export { Square, out, isFellOff, move2Square, isStar, squarePos };
+// Function to manipulate the squares
+// return an other square
+// PRECOND: The robot is on the board
+
+function move2Square(aSquare: Square, aDir: Dir): Square {
+  return (aSquare as Edge<Square>).vertices[aDir];
+}
+
+
+
+export { Square, out, isFellOff, squareColor, isStar, squarePos, move2Square };
