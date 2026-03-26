@@ -1,5 +1,5 @@
 import { Dir, Color, Pos } from "./puzzle";
-import { Square, out, isFellOff, squareColor, isStar, squarePos, move2Square } from "./square";
+import { Square, out, squareIsOut, squareIsStar, squareColor, squarePos, square2square } from "./square";
 
 // Robot definiton
 // It is on a square (position int the board) and directed on a dir
@@ -8,33 +8,29 @@ type Robot = {
   dir: Dir;
 }
 
-// Verification functions on robot
+// Attribute functions on robot based of square
 
-function isRobotFell(aRobot: Robot): boolean {
-  return isFellOff(aRobot.square);
+function generalSquare<K>(aFunction: (aSquare: Square) => K): (aRobot: Robot) => K {
+  return (aRobot: Robot) => {
+    return aFunction(aRobot.square);
+  };
 }
 
-function isOnStar(aRobot: Robot): boolean {
-  return isStar(aRobot.square);
-}
+const robotIsFell = generalSquare(squareIsOut);
 
-// Atributes functions on robot
+const robotIsStar = generalSquare(squareIsStar);
 
-function robotColor(aRobot: Robot): Color {
-  return squareColor(aRobot.square);
-}
+const robotColor = generalSquare(squareColor);
 
-function robotPos(aRobot: Robot): Pos {
-  return squarePos(aRobot.square);
-}
+const robotPos = generalSquare(squarePos);
 
-// Action funcitons on robot
+// Action functions on robot
 // We create a new robot with the modifications
 
 // TODO: Crée un nouveau graph si le robot tombe sur une étoile
 function moveForward(aRobot: Robot): Robot {
   const robotNew: Robot = {
-    square: move2Square(aRobot.square, aRobot.dir),
+    square: square2square(aRobot.square, aRobot.dir),
     dir: aRobot.dir
   };
   return robotNew;
@@ -56,4 +52,4 @@ function turnLeft(aRobot: Robot): Robot {
   return robotNew;
 }
 
-export { isRobotFell, isOnStar, robotColor, robotPos, moveForward, turnRight, turnLeft };
+export { Robot, robotIsFell, robotIsStar, robotColor, robotPos, moveForward, turnRight, turnLeft };

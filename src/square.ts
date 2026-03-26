@@ -1,13 +1,5 @@
 import { Color, Pos, Dir } from "./puzzle";
 
-// Structure of the edges of the board graph
-type Edge<T> = {
-  isStar: boolean;
-  color: Color;
-  position: Pos;
-  vertices: Array<T>;    
-};
-
 // The squares composes our board
 // They are made out of edges but can be undefined if the robot fell off the board
 type Square = undefined | {
@@ -17,35 +9,37 @@ type Square = undefined | {
   vertices: Array<Square>;    
 };
 
+type Edge = {
+  isStar: boolean;
+  color: Color;
+  position: Pos;
+  vertices: Array<Square>;    
+};
+
 // Represents the end of the board
 const out = undefined;
 
-// Attributes functions
+// Verify if we are out of the board
 
-function isFellOff(aSquare: Square): boolean {
+function squareIsOut(aSquare: Square): boolean {
   return aSquare === out;
 }
 
-function squareColor(aSquare: Square): Color {
-  return aSquare.color;
+// Attributes functions
+// PRECOND: square has to be on the board
+
+function pluck<K extends keyof Edge>(aField: K): (aSquare: Square) => Edge[K] {
+  return (aSquare: Square) => {
+    return (aSquare as Edge)[aField];
+  };
 }
 
-function isStar(aSquare: Square): boolean {
-  return (aSquare as Edge<Square>).isStar;
-}
+const squareIsStar = pluck("isStar");
 
-function squarePos(aSquare: Square): Pos {
-  return (aSquare as Edge<Square>).position;
-}
+const squareColor = pluck("color");
 
-// Function to manipulate the squares
-// return an other square
-// PRECOND: The robot is on the board
+const squarePos = pluck("position");
 
-function move2Square(aSquare: Square, aDir: Dir): Square {
-  return (aSquare as Edge<Square>).vertices[aDir];
-}
+const square2square = (aSquare: Square, aDir: Dir) => pluck("vertices")(aSquare)[aDir];
 
-
-
-export { Square, out, isFellOff, squareColor, isStar, squarePos, move2Square };
+export { Square, out, squareIsOut, squareIsStar, squareColor, squarePos, square2square };
