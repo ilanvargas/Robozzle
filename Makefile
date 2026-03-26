@@ -1,10 +1,7 @@
 TEST_BINARIES := $(wildcard ./test/*.ts)
 
-
-
 build:
 	npx tsc
-
 
 test:
 	@echo "--- Exécution de tous les tests ---"
@@ -15,10 +12,8 @@ test:
 	done
 	@echo "--- Tous les tests sont terminés ---"
 
-
 eslint:
-	npx eslint dist/src dist/test
-
+	npx eslint src/ 
 
 serve:
 	npx parcel serve src/index.html

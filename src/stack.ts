@@ -7,7 +7,7 @@ type PointedPair<T, U> = {
 type Stack<T> = undefined | { head: T, cdr: Stack<T> };
 
 // Empty empty implementation
-const nil = undefined
+const nil = undefined;
 
 // Create pointed pair {aHead; aCdr}
 // Used to add first element aHead into aCdr stack

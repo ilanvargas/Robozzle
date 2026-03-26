@@ -1,28 +1,42 @@
-//Enumeration of the direction
+
+// Definition of a puzzle raw
+type Puzzle = {
+  id: number,
+  title: string,
+  about: string,
+  robotCol: number,
+  robotRow: number,
+  robotDir: number,
+  subs: Array<number>,
+  allwedCommands: number,
+  board: string
+}
+
+// Enumeration of the directions
 enum Dir {
-    EST = 0,
-    SUD,
-    WEST,
-    NORD,
+  NORD,
+  EAST,
+  SOUTH,
+  WEST,
+  MAXDIRS
 };
 
-
-//Enumeration of the Colors
+// Enumeration of the colors in the board
 enum Color {
-    NO_COLOR = 0,
-    BLUE,   
-    GREEN,
-    RED,
+  NO_COLOR,
+  BLUE,   
+  GREEN,
+  RED,
+  MAXCOLORS
 };
 
-
-//Position of the case 
-interface Position {
-    x : number;
-    y : number;
+// Position of the case 
+interface Pos {
+  x: number;
+  y: number;
 };
 
-export { Dir, Color, Position };
+export { Puzzle, Dir, Color, Pos };
 
 
 
