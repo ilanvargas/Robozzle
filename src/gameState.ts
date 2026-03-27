@@ -29,3 +29,5 @@ function actionGame(funGame: (g: Game) => Game): Action {
     };
   };
 }
+
+export { State, actionGame, Action }
