@@ -27,31 +27,40 @@ const robotPos = generalSquare(squarePos);
 
 // Action functions on robot
 // We create a new robot with the modifications
-// Can create a new board
+// Can create a new board if modified
+
+// We wrap board and robot into game type
+type Game = {
+  robot: Robot;
+  board: Board;
+}
 
 // TODO: Crée un nouveau graph si le robot tombe sur une étoile
-function moveForward(aRobot: Robot, aBoard: Board) {
+function moveForward(g: Game): Game {
   const robotNew: Robot = {
-    square: move2square(aRobot.square, aRobot.dir),
-    dir: aRobot.dir
+    square: move2square(g.robot.square, g.robot.dir),
+    dir: g.robot.dir
   };
-  return [robotNew, Board];
+
+  return {robot: robotNew, board: g.board};
 }
 
-function turnRight(aRobot: Robot, aBoard: Board) {
+function turnRight(g: Game): Game {
   const robotNew = {
-    square: aRobot.square,
-    dir: (aRobot.dir + 1) % Dir.MAXDIRS
+    square: g.robot.square,
+    dir: (g.robot.dir + 1) % Dir.MAXDIRS
   };
-  return [robotNew, Board];
+
+  return {robot: robotNew, board: g.board};
 }
 
-function turnLeft(aRobot: Robot, aBoard: Board) {
+function turnLeft(g: Game): Game {
   const robotNew = {
-    square: aRobot.square,
-    dir: (aRobot.dir - 1) % Dir.MAXDIRS
+    square: g.robot.square,
+    dir: (g.robot.dir - 1) % Dir.MAXDIRS
   };
-  return [robotNew, Board];
+  
+  return {robot: robotNew, board: g.board};
 }
 
-export { Robot, robotIsFell, robotIsStar, robotColor, robotPos, moveForward, turnRight, turnLeft };
+export { Robot, robotIsFell, robotIsStar, robotColor, robotPos, Game, moveForward, turnRight, turnLeft };
