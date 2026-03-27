@@ -1,4 +1,4 @@
-import { Color, Pos, Dir } from "./puzzle";
+import { Color, Pos } from "./puzzle";
 
 // The squares composes our board
 // They are made out of edges but can be undefined if the robot fell off the board
@@ -40,6 +40,6 @@ const squareColor = pluck("color");
 
 const squarePos = pluck("position");
 
-const square2square = (aSquare: Square, aDir: Dir) => pluck("vertices")(aSquare)[aDir];
+const squareNeighbours = pluck("vertices");
 
-export { Square, out, squareIsOut, squareIsStar, squareColor, squarePos, square2square };
+export { Square, out, squareIsOut, squareIsStar, squareColor, squarePos, squareNeighbours };
