@@ -1,5 +1,5 @@
-import { Puzzle, Dir } from "./puzzle";
-import { Square, out, squareIsOut, squareIsStar, squareColor, squarePos, squareNeighbours } from "./square";
+import { Puzzle, Dir } from "./puzzle.js";
+import { Square, out, squareIsOut, squareIsStar, squareColor, squarePos, squareNeighbours } from "./square.js";
 
 type Board = {
   start: Square;
