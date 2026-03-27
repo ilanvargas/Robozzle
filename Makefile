@@ -18,4 +18,7 @@ eslint:
 serve:
 	npx parcel serve src/index.html
 
+clean:
+	rm -rf dist/*
 
+.PHONY: build test eslint serve clean

@@ -1,6 +1,6 @@
-import { Dir, Color, Pos } from "./puzzle";
-import { Square, out, squareIsOut, squareIsStar, squareColor, squarePos } from "./square";
-import { Board, isWin, move2square } from "./board";
+import { Dir, Color, Pos } from "./puzzle.js";
+import { Square, out, squareIsOut, squareIsStar, squareColor, squarePos } from "./square.js";
+import { Board, isWin, move2square } from "./board.js";
 
 // Robot definiton
 // It is on a square (position int the board) and directed on a dir
@@ -63,4 +63,10 @@ function turnLeft(g: Game): Game {
   return {robot: robotNew, board: g.board};
 }
 
-export { Robot, robotIsFell, robotIsStar, robotColor, robotPos, Game, moveForward, turnRight, turnLeft };
+const robotActionArray = [
+  moveForward,
+  turnRight,
+  turnLeft
+];
+
+export { Robot, robotIsFell, robotIsStar, robotColor, robotPos, Game, robotActionArray };

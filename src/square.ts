@@ -1,4 +1,4 @@
-import { Color, Pos } from "./puzzle";
+import { Color, Pos } from "./puzzle.js";
 
 // The squares composes our board
 // They are made out of edges but can be undefined if the robot fell off the board

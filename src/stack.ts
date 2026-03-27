@@ -11,7 +11,7 @@ const nil = undefined;
 
 // Create pointed pair {aHead; aCdr}
 // Used to add first element aHead into aCdr stack
-function cons<T, U>(aCar: T, aCdr: U) : PointedPair<T, U> {
+function cons<T>(aCar: T, aCdr: Stack<T>): Stack<T> {
     return { head: aCar, cdr: aCdr };
 }
 
