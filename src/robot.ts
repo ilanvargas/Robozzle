@@ -69,4 +69,4 @@ const robotActionArray = [
   turnLeft
 ];
 
-export { Robot, robotIsFell, robotIsStar, robotColor, robotPos, Game, moveForward, turnRight, turnLeft, robotActionArray };
+export { Robot, robotIsFell, robotIsStar, robotColor, robotPos, Game, robotActionArray };
