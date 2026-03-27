@@ -27,30 +27,31 @@ const robotPos = generalSquare(squarePos);
 
 // Action functions on robot
 // We create a new robot with the modifications
+// Can create a new board
 
 // TODO: Crée un nouveau graph si le robot tombe sur une étoile
-function moveForward(aRobot: Robot): Robot {
+function moveForward(aRobot: Robot, aBoard: Board) {
   const robotNew: Robot = {
     square: move2square(aRobot.square, aRobot.dir),
     dir: aRobot.dir
   };
-  return robotNew;
+  return [robotNew, Board];
 }
 
-function turnRight(aRobot: Robot): Robot {
+function turnRight(aRobot: Robot, aBoard: Board) {
   const robotNew = {
     square: aRobot.square,
     dir: (aRobot.dir + 1) % Dir.MAXDIRS
   };
-  return robotNew;
+  return [robotNew, Board];
 }
 
-function turnLeft(aRobot: Robot): Robot {
+function turnLeft(aRobot: Robot, aBoard: Board) {
   const robotNew = {
     square: aRobot.square,
     dir: (aRobot.dir - 1) % Dir.MAXDIRS
   };
-  return robotNew;
+  return [robotNew, Board];
 }
 
 export { Robot, robotIsFell, robotIsStar, robotColor, robotPos, moveForward, turnRight, turnLeft };
