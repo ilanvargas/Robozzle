@@ -2,8 +2,8 @@ import { isWin, Board, boardInit } from "./board.js";
 import { squareColor } from "./square.js";
 import { Stack, isEmpty, nil } from "./stack.js";
 import { Puzzle } from "./puzzle.js";
-import { State } from "./gameState.js"
-
+import { State, popStateStack } from "./gameState.js"
+import { robotIsFell } from "./robot.js";
 
 function initState(aPuzzle: Puzzle){
     const board = boardInit(aPuzzle);
@@ -20,15 +20,18 @@ function initState(aPuzzle: Puzzle){
 
 
 function loop(aState: State){
-    if (isEmpty(aState.stack)){
-        return;
+    let state = aState;
+// Continue to execute actions until stack empties or end conditions are met.
+    while (!isEmpty(state.stack) && !isWin(state.board) && !robotIsFell(state.robot)) {
+    	state = popStateStack(state);
     }
-    if (isWin(aState.board)){
-        return;
-    }
+    return state;
 }
 
 
-//const state = initState(aPuzzle); 
+// const state = initState(aPuzzle);
+// const finalState = loop(state);
+// console.log(finalState);
+
 
 
