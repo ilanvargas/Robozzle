@@ -18,7 +18,6 @@ type Edge = {
 const out = undefined;
 
 // Verify if we are out of the board
-
 function squareIsOut(aSquare: Square): boolean {
   return aSquare === out;
 }
