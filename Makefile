@@ -9,7 +9,7 @@ test:
 	@echo "--- Tous les tests sont terminés ---"
 
 eslint:
-	npx eslint src/ 
+	npx eslint --fix src/ test/
 
 serve:
 	npx parcel serve src/index.html
