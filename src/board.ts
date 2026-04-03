@@ -1,4 +1,4 @@
-import { Puzzle, Color, Dir, puzzleWidth } from "./puzzle.js";
+import { Puzzle, Color, Dir, puzzleWidth, puzzleHeight } from "./puzzle.js";
 import { Square, out, squareIsOut, squareIsStar, squareColor, squarePos } from "./square.js";
 
 // The type board is defined by the board plus additionnal information
@@ -10,7 +10,8 @@ type Board = {
   board: Array<Square>
 };
 
-// Creation of board
+// Creation of the first game board
+// Converts a Puzzle into a type Board
 function boardInit(aPuzzle: Puzzle): Board {
   function boardMap(aFunc: (x: string, i: number) => Square, i: number, aStr: string)
     : Array<Square> {
@@ -56,46 +57,41 @@ function isWin(aBoard: Board) {
   return aBoard.nbStars === 0;
 }
 
-function isValid(aSquare: Square): boolean {
-  return aSquare !== out;
-}
-
-
-function colorWithStar(aColor: number): string {
-  switch (aColor) {
-    case 0:
-      return "B";
-    case 1:
-      return "G";
-    case 2:
-      return "R";
-    default:
-      return "?";
-  }
-}
-
-
-function colorWithoutStar(aColor: number): string {
-  switch (aColor) {
-    case 0:
-      return "b";
-    case 1:
-      return "g";
-    case 2:
-      return "r";
-    default:
-      return "?";
-  }
-}
-
-
-
+// TUI interpretation of board
 function boardShow(aBoard: Board) {
-  for (let y = 0; y < PuzzleHeight; y++) {
+  function colorWithStar(aColor: number): string {
+    switch (aColor) {
+      case Color.BLUE:
+        return "B";
+      case Color.GREEN:
+        return "G";
+      case Color.RED:
+        return "R";
+      default:
+        return "?";
+    }
+  }
+
+  function colorWithoutStar(aColor: number): string {
+    switch (aColor) {
+      case Color.NOCOLOR:
+        return "#";
+      case Color.BLUE:
+        return "b";
+      case Color.GREEN:
+        return "g";
+      case Color.RED:
+        return "r";
+      default:
+        return "?";
+    }
+  }
+
+  for (let y = 0; y < puzzleHeight; y++) {
     let line = "";
-    for (let x = 0; x < PuzzleWidth; x++) {
-      const square = aBoard.board[y * PuzzleWidth + x];
-      line += isValid(square) ? square.isStar ? colorWithStar(square.color) : colorWithoutStar(square.color) : "#";
+    for (let x = 0; x < puzzleWidth; x++) {
+      const square = aBoard.board[y * puzzleWidth + x];
+      line += square.isStar ? colorWithStar(square.color) : colorWithoutStar(square.color);
     }
     console.log(line);
   }
