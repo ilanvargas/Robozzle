@@ -6,14 +6,12 @@ type Square = undefined | {
   isStar: boolean;
   color: Color;
   position: Pos;
-  vertices: Array<Square>;    
 };
 
 type Edge = {
   isStar: boolean;
   color: Color;
   position: Pos;
-  vertices: Array<Square>;    
 };
 
 // Represents the end of the board
@@ -40,6 +38,4 @@ const squareColor = pluck("color");
 
 const squarePos = pluck("position");
 
-const squareNeighbours = pluck("vertices");
-
-export { Square, out, squareIsOut, squareIsStar, squareColor, squarePos, squareNeighbours };
+export { Square, out, squareIsOut, squareIsStar, squareColor, squarePos };
