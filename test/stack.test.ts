@@ -24,7 +24,7 @@ describe('Stack test suite', () => {
 
     test('Test the head of a stack', () => {
         const s = S.cons(1, S.nil);
-        expect(S.head(s)).toBe(1)
+        expect(S.head(s)).toBe(1);
     });
 });
  
