@@ -3,20 +3,21 @@
 type PointedPair<T, U> = {
     head: T,
     cdr: U,
+    size: number
 };
-type Stack<T> = undefined | { head: T, cdr: Stack<T> };
+type Stack<T> = {size: number} | { head: T, cdr: Stack<T>, size: number };
 
-// Empty empty implementation
-const nil = undefined;
+// Empty stack implementation
+const nil = {size: 0};
 
 // Create pointed pair {aHead; aCdr}
 // Used to add first element aHead into aCdr stack
 function cons<T>(aCar: T, aCdr: Stack<T>): Stack<T> {
-    return { head: aCar, cdr: aCdr };
+    return { head: aCar, cdr: aCdr, size: aCdr.size+1 };
 }
 
 // Tests if stack is empty
-function isEmpty<T>(aStack: Stack<T>): boolean {
+function stackIsEmpty<T>(aStack: Stack<T>): boolean {
     return aStack === nil;
 }
 
@@ -32,4 +33,8 @@ function tail<T>(aStack: Stack<T>): Stack<T> {
     return (aStack as PointedPair<T, Stack<T>>).cdr;
 }
 
-export { Stack, nil, cons, isEmpty, head, tail };
+function stackSize<T>(aStack: Stack<T>): number {
+  return aStack.size;
+}
+
+export { Stack, nil, cons, stackIsEmpty, head, tail, stackSize };

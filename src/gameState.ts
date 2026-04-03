@@ -49,7 +49,6 @@ function actionFunct(aFunct: Funct): Action {
   };
 }
 
-
 // Apply head of state's stack action on state
 // Returns new state
 function popStateStack(aState: State) {

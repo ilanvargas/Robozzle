@@ -1,8 +1,8 @@
 import { isWin, Board, boardInit } from "./board.js";
 import { squareColor } from "./square.js";
-import { Stack, isEmpty, nil } from "./stack.js";
+import { Stack, stackIsEmpty, nil } from "./stack.js";
 import { Puzzle } from "./puzzle.js";
-import { State } from "./gameState.js"
+import { State } from "./gameState.js";
 
 
 function initState(aPuzzle: Puzzle){
@@ -20,7 +20,7 @@ function initState(aPuzzle: Puzzle){
 
 
 function loop(aState: State){
-    if (isEmpty(aState.stack)){
+    if (stackIsEmpty(aState.stack)){
         return;
     }
     if (isWin(aState.board)){
