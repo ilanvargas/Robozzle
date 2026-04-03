@@ -5,27 +5,29 @@ import { Puzzle } from "./puzzle.js";
 import { State, popStateStack } from "./gameState.js";
 import { robotIsFell } from "./robot.js";
 
-function initState(aPuzzle: Puzzle){
-    const board = boardInit(aPuzzle);
+//const listFunc;
 
-    return {
-        robot: {
-            square: board.start,
-            Dir: 0
-        },
-        board: board,
-        stack: nil
-    };
+function initState(aPuzzle: Puzzle){
+  const board = boardInit(aPuzzle);
+
+  return {
+    robot: {
+      square: board.start,
+      Dir: 0
+    },
+    board: board,
+    stack: nil
+  };
 }
 
 
 function loop(aState: State){
-    let state = aState;
-    // Continue to execute actions until stack empties or end conditions are met.
-    while (!stackIsEmpty(state.stack) && !isWin(state.board) && !robotIsFell(state.robot)) {
-      state = popStateStack(state);
-    }
-    return state;
+  let state = aState;
+  // Continue to execute actions until stack empties or end conditions are met.
+  while (!stackIsEmpty(state.stack) && !isWin(state.board) && !robotIsFell(state.robot)) {
+    state = popStateStack(state);
+  }
+  return state;
 }
 
 
