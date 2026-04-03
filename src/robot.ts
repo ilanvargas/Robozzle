@@ -2,8 +2,8 @@ import { Dir, Color, Pos } from "./puzzle.js";
 import { Square, out, squareIsOut, squareIsStar, squareColor, squarePos } from "./square.js";
 import { Board, isWin, move2square } from "./board.js";
 
-// Robot definiton
-// It is on a square (position int the board) and directed on a dir
+// Definition of the robot
+// The robot is defined by the square witch it is in and the direction witch is pointing
 type Robot = {
   square: Square;
   dir: Dir;
@@ -25,15 +25,16 @@ const robotColor = generalSquare(squareColor);
 
 const robotPos = generalSquare(squarePos);
 
-// Action functions on robot
-// We create a new robot with the modifications
-// Can create a new board if modified
-
 // We wrap board and robot into game type
 type Game = {
   robot: Robot;
   board: Board;
 }
+
+// Action functions on robot
+// ARGS: the current game (robot and board)
+// RETURNS: updated game
+// POSTCOND: the current game (and its attributes) are not modified
 
 // TODO: Crée un nouveau graph si le robot tombe sur une étoile
 function moveForward(g: Game): Game {
@@ -63,6 +64,7 @@ function turnLeft(g: Game): Game {
   return {robot: robotNew, board: g.board};
 }
 
+// Regrouping all of the robot's actions
 const robotActionArray = [
   moveForward,
   turnRight,

@@ -2,24 +2,28 @@ import { Stack, cons, head, tail } from "./stack.js";
 import { Board } from "./board.js";
 import { Robot, Game } from "./robot.js";
 
-// Definition of an action applicable on the game state
-// Returns a new state with the action's modifications
-type Action = (aState: State) => State;
-
-// A game state is composed of the board, robot (Game) and stack with the actions to do
+// Definition of a game state
+// The state is defined by the board, the robot and a stack witch the actions to do
 type State = {
   robot: Robot;
   board: Board;
   stack: Stack<Action>;
 };
 
-// A game function is an array of action
-// IMPORTANT: For stack implementation the array is reversed, the first element is on the
-// last position
-// This is done so it can become the head of the stack
+// Definition of an action
+// An action is a function that takes as an argument a game state and returns a modified one
+// The previous state is not modified
+type Action = (aState: State) => State;
+
+// Definition of a game function: an array of actions
+// IMPORTANT: For stack implementation the array is reversed
+// This is done for implentation purposes; the first action becomes the head of state.stack
+// The action also manages the state.stack
 type Funct = Array<Action>
 
-// Transforms an action on the game to an action on the game state
+// Convertes an action of the robot+board into an action of the game state
+// ARG: an game function 
+// RETURN: action
 function actionGame(funGame: (g: Game) => Game): Action {
   return (aState: State) => {
     const gNew = funGame({ robot: aState.robot, board: aState.board });
@@ -32,8 +36,10 @@ function actionGame(funGame: (g: Game) => Game): Action {
   };
 }
 
-// Implements going to a game function as an action
-// This means adding function's actions to the state's stack
+// Implements the action of calling a function
+// This action will push all function's actions into state.stack
+// ARG: a function
+// RETURN: action
 function actionFunct(aFunct: Funct): Action {
   return (aState: State) => {
     const stackNew = aFunct.
@@ -49,9 +55,10 @@ function actionFunct(aFunct: Funct): Action {
   };
 }
 
-// Apply head of state's stack action on state
-// Returns new state
-function popStateStack(aState: State) {
+// Apply head of state.stack action into state
+// ARG: state
+// RETURN: state after action application
+function popStateStack(aState: State): State {
   const aAction = head(aState.stack);
   return aAction(aState);
 }

@@ -3,7 +3,8 @@
 const puzzleWidth = 12;
 const puzzleHeight = 10;
 
-// Definition of a puzzle raw
+// Definition of a "raw puzzle"
+// A puzzle so it's given by the json
 type Puzzle = {
   id: number,
   title: string,
@@ -34,7 +35,7 @@ enum Color {
   MAXCOLORS
 };
 
-// Position of the case 
+// Definition of a position
 interface Pos {
   x: number;
   y: number;
