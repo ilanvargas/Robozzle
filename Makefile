@@ -1,15 +1,11 @@
-TEST_BINARIES := $(wildcard ./test/*.ts)
+TEST_BINARIES := $(wildcard ./test/*.js)
 
 build:
 	npx tsc
 
 test:
 	@echo "--- Exécution de tous les tests ---"
-	@for test_exec in $(TEST_BINARIES); do \
-		echo "=> Exécution de $$test_exec"; \
-		npx jest $$test_exec; \
-		echo ""; \
-	done
+	npx jest
 	@echo "--- Tous les tests sont terminés ---"
 
 eslint:
