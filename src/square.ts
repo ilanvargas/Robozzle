@@ -2,7 +2,7 @@ import { Color, Pos } from "./puzzle.js";
 
 // The squares composes our board
 // They are made out of edges but can be undefined if the robot fell off the board
-type Square = undefined | {
+type Square = {color: Color} | {
   isStar: boolean;
   color: Color;
   position: Pos;
@@ -15,7 +15,7 @@ type Edge = {
 };
 
 // Represents the end of the board
-const out = undefined;
+const out = {color: Color.NOCOLOR};
 
 // Verify if we are out of the board
 function squareIsOut(aSquare: Square): boolean {

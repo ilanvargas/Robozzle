@@ -1,4 +1,8 @@
 
+// Puzzle size
+const puzzleWidth = 12;
+const puzzleHeight = 10;
+
 // Definition of a puzzle raw
 type Puzzle = {
   id: number,
@@ -23,7 +27,7 @@ enum Dir {
 
 // Enumeration of the colors in the board
 enum Color {
-  NO_COLOR,
+  NOCOLOR,
   BLUE,   
   GREEN,
   RED,
@@ -36,7 +40,7 @@ interface Pos {
   y: number;
 };
 
-export { Puzzle, Dir, Color, Pos };
+export { Puzzle, Dir, Color, Pos, puzzleWidth, puzzleHeight};
 
 
 
