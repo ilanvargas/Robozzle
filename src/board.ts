@@ -99,6 +99,17 @@ function boardShow(aBoard: Board) {
 
 // Move to a neighbour square on aDir direction
 // Will NOT create a new board; problem if we have a board modification
-function move2square(aSquare: Square, aDir: Dir) {return out;}
+function move2square(aSquare: Square, aDir: Dir): Square {return out;}
+
+
+function removeStar(aSquare: Square, aBoard: Board): Board {
+  newSquare = {isStar: false
+    color: aBoard.board[aSquare.position.y * puzzleWidth + aSquare.position.x].color,
+    position: aSquare.position
+  }
+    newBoard = {
+    start: aBoard.start, }
+  return newaBoard;
+}
 
 export { Board, isWin, move2square, boardInit };
