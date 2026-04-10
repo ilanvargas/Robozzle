@@ -20,6 +20,8 @@ function initState(aPuzzle: Puzzle, listFunc: (state: State) => State[]): State 
   };
 }
 
+
+
 function loop(aState: State): void{
   const state = aState;
   // Continue to execute actions until stack empties or end conditions are met.
