@@ -1,4 +1,4 @@
-import { Color, Pos } from "../src/puzzle.js";
+import { Color } from "../src/puzzle.js";
 import * as sq from "../src/square.js";
 // import { Color, Pos } from "./src/puzzle.js";
 
