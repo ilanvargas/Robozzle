@@ -39,7 +39,7 @@ type Game = {
 // TODO: Crée un nouveau graph si le robot tombe sur une étoile
 function moveForward(g: Game): Game {
   const robotNew: Robot = {
-    square: move2square(g.robot.square, g.robot.dir),
+    square: move2square(g.board, g.robot.square, g.robot.dir),
     dir: g.robot.dir
   };
 

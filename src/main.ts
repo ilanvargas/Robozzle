@@ -1,22 +1,22 @@
 import { isWin, Board, boardInit } from "./board.js";
 import { squareColor } from "./square.js";
-import { Stack, stackIsEmpty, nil } from "./stack.js";
+import { Stack, stackIsEmpty, nil, cons } from "./stack.js";
 import { Puzzle } from "./puzzle.js";
 import { State, popStateStack } from "./gameState.js";
 import { robotIsFell } from "./robot.js";
 
 //const listFunc;
 
-function initState(aPuzzle: Puzzle){
+function initState(aPuzzle: Puzzle, listFunc: (state: State) => State[]): State {
   const board = boardInit(aPuzzle);
 
   return {
     robot: {
       square: board.start,
-      Dir: 0
+      dir: 0
     },
     board: board,
-    stack: nil
+    stack: cons(listFunc, nil)
   };
 }
 
@@ -32,6 +32,11 @@ function loop(aState: State){
   }
 }
 
+function main(aPuzzle: Puzzle, listFunc: (state: State) => State[]){
+  const state = initState(aPuzzle, listFunc);
+  const finalState = loop(state);
+  console.log(finalState);
+}
 
 
 
