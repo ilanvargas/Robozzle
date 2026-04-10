@@ -13,7 +13,7 @@ type Puzzle = {
   robotRow: number,
   robotDir: number,
   subs: Array<number>,
-  allwedCommands: number,
+  allowedCommands: number,
   board: string
 }
 

@@ -121,4 +121,4 @@ function move2square(aBoard: Board, aSquare: Square, aDir: Dir) {
 }
 
 
-export { Board, isWin, move2square, boardInit };
+export { Board, isWin, move2square, boardInit, boardShow };
