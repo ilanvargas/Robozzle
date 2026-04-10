@@ -104,16 +104,16 @@ function move2square(aBoard: Board, aSquare: Square, aDir: Dir) {
   const pos = squarePos(aSquare);
   switch (aDir) {
     case Dir.NORD:
-      let north = aBoard.board[(pos.x-1)*puzzleWidth + pos.y];
+      const north = aBoard.board[(pos.x-1)*puzzleWidth + pos.y];
       return squareIsOut(north) ? out : north;
     case Dir.EAST:
-      let east = aBoard.board[pos.x*puzzleWidth + pos.y+1];
+      const east = aBoard.board[pos.x*puzzleWidth + pos.y+1];
       return squareIsOut(east) ? out : east;
     case Dir.SOUTH:
-      let south = aBoard.board[(pos.x+1)*puzzleWidth + pos.y];
+      const south = aBoard.board[(pos.x+1)*puzzleWidth + pos.y];
       return squareIsOut(south) ? out : south;
     case Dir.WEST:
-      let west = aBoard.board[pos.x*puzzleWidth + pos.y-1];
+      const west = aBoard.board[pos.x*puzzleWidth + pos.y-1];
       return squareIsOut(west) ? out : west;
     default:
       return out;
