@@ -21,7 +21,7 @@ function initState(aPuzzle: Puzzle, listFunc: (state: State) => State[]): State 
 }
 
 function loop(aState: State){
-  let state = aState;
+  const state = aState;
   // Continue to execute actions until stack empties or end conditions are met.
   if (stackIsEmpty(state.stack) || isWin(state.board) || robotIsFell(state.robot)) {
     return ;
