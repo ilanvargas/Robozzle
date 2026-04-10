@@ -81,7 +81,7 @@ const robotActionArray = [
 
 
 // TUI interpretation of board
-function boardShow(aBoard: Board, aRobot: Robot) {
+function boardShow(aBoard: Board, aSquare: Square){
   function colorWithStar(aColor: number): string {
     switch (aColor) {
       case Color.BLUE:
@@ -114,7 +114,7 @@ function boardShow(aBoard: Board, aRobot: Robot) {
     let line = "";
     for (let x = 0; x < puzzleWidth; x++) {
       const square = aBoard.board[y * puzzleWidth + x];
-      if (square === aRobot.square) 
+      if (square === aSquare) 
         line +="X";
       else
         line += square.isStar ? colorWithStar(square.color) : colorWithoutStar(square.color);
@@ -124,4 +124,4 @@ function boardShow(aBoard: Board, aRobot: Robot) {
 }
 
 export { Robot, robotIsFell, robotIsStar, robotColor, robotPos, Game, robotActionArray };
-export { moveForward, turnRight, turnLeft };
+export { moveForward, turnRight, turnLeft, boardShow };
