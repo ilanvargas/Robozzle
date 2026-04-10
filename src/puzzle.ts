@@ -1,7 +1,7 @@
 
 // Puzzle size
-const puzzleWidth = 12;
-const puzzleHeight = 10;
+const puzzleWidth = 16;
+const puzzleHeight = 12;
 
 // Definition of a "raw puzzle"
 // A puzzle so it's given by the json
