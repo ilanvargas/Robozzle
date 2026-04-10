@@ -67,7 +67,6 @@ function move2square(aBoard: Board, aSquare: Square, aDir: Dir) {
 
   switch (aDir) {
     case Dir.NORD:
-<<<<<<< HEAD
       const north = (pos.x-1)*puzzleWidth + pos.y;
       return isIn(north) ? aBoard.board[north] : out;
     case Dir.EAST:
@@ -79,19 +78,6 @@ function move2square(aBoard: Board, aSquare: Square, aDir: Dir) {
     case Dir.WEST:
       const west = pos.x*puzzleWidth + pos.y-1;
       return isIn(west) ? aBoard.board[west] : out;
-=======
-      const north = aBoard.board[(pos.x-1)*puzzleWidth + pos.y];
-      return squareIsOut(north) ? out : north;
-    case Dir.EAST:
-      const east = aBoard.board[pos.x*puzzleWidth + pos.y+1];
-      return squareIsOut(east) ? out : east;
-    case Dir.SOUTH:
-      const south = aBoard.board[(pos.x+1)*puzzleWidth + pos.y];
-      return squareIsOut(south) ? out : south;
-    case Dir.WEST:
-      const west = aBoard.board[pos.x*puzzleWidth + pos.y-1];
-      return squareIsOut(west) ? out : west;
->>>>>>> refs/remotes/origin/master
     default:
       return out;
   }
@@ -104,7 +90,6 @@ function removeStar(aBoard: Board, aSquare: Square) {
     position: aSquare.position
   };
 
-<<<<<<< HEAD
   return {
     start: aBoard.start,
     nbStars: aBoard.nbStars-1,
@@ -118,6 +103,4 @@ function removeStar(aBoard: Board, aSquare: Square) {
 }
 
 export { Board, isWin, move2square, boardInit, boardShow, removeStar };
-=======
-export { Board, isWin, move2square, boardInit };
->>>>>>> refs/remotes/origin/master
+
