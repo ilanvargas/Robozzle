@@ -20,15 +20,20 @@ function initState(aPuzzle: Puzzle){
   };
 }
 
-
 function loop(aState: State){
   let state = aState;
   // Continue to execute actions until stack empties or end conditions are met.
-  while (!stackIsEmpty(state.stack) && !isWin(state.board) && !robotIsFell(state.robot)) {
-    state = popStateStack(state);
+  if (stackIsEmpty(state.stack) || isWin(state.board) || robotIsFell(state.robot)) {
+    return ;
   }
-  return state;
+  else {    // Pop the next action from the stack and execute it, then loop again.
+    const nextState = popStateStack(state);
+    return loop(nextState);
+  }
 }
+
+
+
 
 
 // const state = initState(aPuzzle);
