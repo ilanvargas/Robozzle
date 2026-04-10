@@ -101,24 +101,44 @@ function boardShow(aBoard: Board) {
 // Will NOT create a new board; problem if we have a board modification
 // PRECOND: aSquare is on the board
 function move2square(aBoard: Board, aSquare: Square, aDir: Dir) {
+  const isIn = (i: number) => i > 0 && i < aBoard.board.length;
   const pos = squarePos(aSquare);
+
   switch (aDir) {
     case Dir.NORD:
-      let north = aBoard.board[(pos.x-1)*puzzleWidth + pos.y];
-      return squareIsOut(north) ? out : north;
+      const north = (pos.x-1)*puzzleWidth + pos.y;
+      return isIn(north) ? aBoard.board[north] : out;
     case Dir.EAST:
-      let east = aBoard.board[pos.x*puzzleWidth + pos.y+1];
-      return squareIsOut(east) ? out : east;
+      const east = pos.x*puzzleWidth + pos.y+1;
+      return isIn(east) ? aBoard.board[east] : out;
     case Dir.SOUTH:
-      let south = aBoard.board[(pos.x+1)*puzzleWidth + pos.y];
-      return squareIsOut(south) ? out : south;
+      const south = (pos.x+1)*puzzleWidth + pos.y;
+      return isIn(south) ? aBoard.board[south] : out;
     case Dir.WEST:
-      let west = aBoard.board[pos.x*puzzleWidth + pos.y-1];
-      return squareIsOut(west) ? out : west;
+      const west = pos.x*puzzleWidth + pos.y-1;
+      return isIn(west) ? aBoard.board[west] : out;
     default:
       return out;
   }
 }
 
+function removeStar(aBoard: Board, aSquare: Square) {
+  const squareNew = {
+    isStar: false,
+    color: aSquare.color,
+    position: aSquare.position
+  };
 
-export { Board, isWin, move2square, boardInit, boardShow };
+  return {
+    start: aBoard.start,
+    nbStars: aBoard.nbStars-1,
+    board: aBoard.board.map((e) => {
+      if (e === aSquare)
+        return squareNew;
+      else
+        return e;
+    })
+  }; 
+}
+
+export { Board, isWin, move2square, boardInit, boardShow, removeStar };
