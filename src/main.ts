@@ -20,7 +20,9 @@ function initState(aPuzzle: Puzzle, listFunc: (state: State) => State[]): State 
   };
 }
 
-function loop(aState: State){
+
+
+function loop(aState: State): void{
   const state = aState;
   // Continue to execute actions until stack empties or end conditions are met.
   if (stackIsEmpty(state.stack) || isWin(state.board) || robotIsFell(state.robot)) {
@@ -28,7 +30,8 @@ function loop(aState: State){
   }
   else {    // Pop the next action from the stack and execute it, then loop again.
     const nextState = popStateStack(state);
-    return loop(nextState);
+    loop(nextState);
+    return;
   }
 }
 
