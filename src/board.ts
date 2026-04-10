@@ -52,16 +52,16 @@ function boardInit(aPuzzle: Puzzle): Board {
   return {start: start, nbStars: nbStars, board: board};
 }
 
-// Returns true if player won
-function isWin(aBoard: Board) {
+// Returns true if player won (no more stars on board)
+function isWin(aBoard: Board): boolean {
   return aBoard.nbStars === 0;
 }
 
 
-// return the neighbour square on aDir direction
+// Returns the neighbour square on aDir direction
 // Will NOT create a new board; problem if we have a board modification
 // PRECOND: aSquare is on the board
-function move2square(aBoard: Board, aSquare: Square, aDir: Dir) {
+function move2square(aBoard: Board, aSquare: Square, aDir: Dir): Square {
   const isIn = (i: number) => i > 0 && i < aBoard.board.length;
   const pos = squarePos(aSquare);
 
@@ -83,11 +83,17 @@ function move2square(aBoard: Board, aSquare: Square, aDir: Dir) {
   }
 }
 
-function removeStar(aBoard: Board, aSquare: Square) {
+// Returns a new board without a star on aSquare square
+// ARGS:
+// - aBoard:  board to be modified
+// - aSquare: square to star be removed on new square
+// RETURN:
+// - a new board
+function removeStar(aBoard: Board, aSquare: Square): Board {
   const squareNew = {
     isStar: false,
-    color: aSquare.color,
-    position: aSquare.position
+    color: squareColor(aSquare),
+    position: squarePos(aSquare)
   };
 
   return {
@@ -102,5 +108,5 @@ function removeStar(aBoard: Board, aSquare: Square) {
   }; 
 }
 
-export { Board, isWin, move2square, boardInit, boardShow, removeStar };
+export { Board, isWin, move2square, boardInit, removeStar };
 

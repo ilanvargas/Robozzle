@@ -1,6 +1,6 @@
 import { Dir, Color, Pos, puzzleHeight, puzzleWidth } from "./puzzle.js";
 import { Square, out, squareIsOut, squareIsStar, squareColor, squarePos } from "./square.js";
-import { Board, isWin, move2square } from "./board.js";
+import { Board, isWin, move2square, removeStar } from "./board.js";
 
 // Definition of the robot
 // The robot is defined by the square witch it is in and the direction witch is pointing
@@ -35,15 +35,23 @@ type Game = {
 // ARGS: the current game (robot and board)
 // RETURNS: updated game
 // POSTCOND: the current game (and its attributes) are not modified
-
-// TODO: Crée un nouveau graph si le robot tombe sur une étoile
 function moveForward(g: Game): Game {
+  const squareNew = move2square(g.board, g.robot.square, g.robot.dir);
   const robotNew: Robot = {
-    square: move2square(g.board, g.robot.square, g.robot.dir),
+    square: squareNew,
     dir: g.robot.dir
   };
 
-  return {robot: robotNew, board: g.board};
+  if (squareIsStar(squareNew))
+    return {
+      robot: robotNew,
+      board: removeStar(g.board, g.robot.square)
+    };
+  else
+    return {
+      robot: robotNew, 
+      board: g.board
+    };
 }
 
 function turnRight(g: Game): Game {
@@ -87,7 +95,6 @@ function boardShow(aBoard: Board, aRobot: Robot) {
     }
   }
 
-
   function colorWithoutStar(aColor: number): string {
     switch (aColor) {
       case Color.NOCOLOR:
@@ -103,15 +110,14 @@ function boardShow(aBoard: Board, aRobot: Robot) {
     }
   }
 
-
   for (let y = 0; y < puzzleHeight; y++) {
     let line = "";
     for (let x = 0; x < puzzleWidth; x++) {
       const square = aBoard.board[y * puzzleWidth + x];
-      if (square === aRobot.square) {
+      if (square === aRobot.square) 
         line +="X";
-      }
-      line += square.isStar ? colorWithStar(square.color) : colorWithoutStar(square.color);
+      else
+        line += square.isStar ? colorWithStar(square.color) : colorWithoutStar(square.color);
     }
     console.log(line);
   }
