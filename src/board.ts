@@ -86,8 +86,8 @@ function move2square(aBoard: Board, aSquare: Square, aDir: Dir) {
 function removeStar(aBoard: Board, aSquare: Square) {
   const squareNew = {
     isStar: false,
-    color: aSquare.color,
-    position: aSquare.position
+    color: squareColor(aSquare),
+    position: squarePos(aSquare)
   };
 
   return {
@@ -102,5 +102,5 @@ function removeStar(aBoard: Board, aSquare: Square) {
   }; 
 }
 
-export { Board, isWin, move2square, boardInit, boardShow, removeStar };
+export { Board, isWin, move2square, boardInit, removeStar };
 
