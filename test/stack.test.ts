@@ -1,30 +1,35 @@
-import * as S from "../src/stack.js";
+import * as st from "../src/stack.js";
 
 describe('Stack test suite', () => {
 
     test('Empty stack should be empty', () => {
-        const s = S.nil;
-        expect(S.stackIsEmpty(s)).toBe(true);
+        const s = st.nil;
+        expect(st.stackIsEmpty(s)).toBe(true);
     });
 
     test('Non-empty stack should not be empty', () => {
-        const s = S.cons(1, S.nil);
-        expect(S.stackIsEmpty(s)).toBe(false);
+        const s = st.cons(1, st.nil);
+        expect(st.stackIsEmpty(s)).toBe(false);
     });
     
     test('Size of empty stack', () => {
-        const s = S.nil;
-        expect(S.stackSize(s)).toBe(0);
+        const s = st.nil;
+        expect(st.stackSize(s)).toBe(0);
     });
 
     test('Size of non-empty stack', () => {
-        const s = S.cons(1, S.nil);
-        expect(S.stackSize(s)).toBe(1);
+        const s = st.cons(1, st.nil);
+        expect(st.stackSize(s)).toBe(1);
     });
 
     test('Test the head of a stack', () => {
-        const s = S.cons(1, S.nil);
-        expect(S.head(s)).toBe(1);
+        const s = st.cons(1, st.nil);
+        expect(st.head(s)).toBe(1);
+    });
+
+    test('Test the tail of a stack', () => {
+        const s = st.cons(1, st.nil);
+        expect(st.tail(s)).toBe(st.nil);
     });
 });
  
