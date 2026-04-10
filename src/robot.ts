@@ -118,4 +118,4 @@ function boardShow(aBoard: Board, aRobot: Robot) {
 }
 
 export { Robot, robotIsFell, robotIsStar, robotColor, robotPos, Game, robotActionArray };
-export { moveForward, turnRight, turnLeft, boardShow };
+export { moveForward, turnRight, turnLeft };
