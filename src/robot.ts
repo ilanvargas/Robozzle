@@ -111,7 +111,14 @@ function boardShow(aBoard: Board, aRobot: Robot){
     for (let x = 0; x < puzzleWidth; x++) {
       const square = aBoard.board[y * puzzleWidth + x];
       if (square === aRobot.square) 
-        line +="X";
+        if (aRobot.dir === Dir.EAST)
+          line += ">";
+        else if (aRobot.dir === Dir.WEST)
+          line += "<";
+        else if (aRobot.dir === Dir.NORD)
+          line += "^";
+        else
+          line += "v";
       else
         line += square.isStar ? colorWithStar(square.color) : colorWithoutStar(square.color);
     }

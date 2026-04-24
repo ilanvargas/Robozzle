@@ -9,7 +9,8 @@ const aPuzzle = {id:14, title:"Can you reach the stars?", about:"This puzzle is 
                 };
 
 const bor = bo.boardInit(aPuzzle);
-ro.boardShow(bor,bor.start);
+const robot = {square: bor.start, dir:3}
+ro.boardShow(bor, robot);
 
 const puzzle = {
     id: 330,
@@ -26,8 +27,8 @@ const puzzle = {
 
 console.log("\n");
 const bor2 = bo.boardInit(puzzle);    
-
-ro.boardShow(bor2,bor2.start);
+const robot2 = {square: bor2.start, dir:3}
+ro.boardShow(bor2,robot2);
 
 // describe('Board test suite', () => {
 //     test('if board is win', () => {
