@@ -1,6 +1,6 @@
-import { Dir, Color, Pos, puzzleHeight, puzzleWidth } from "#src/puzzle.js";
-import { Square, out, squareIsOut } from "#src/square.js";
-import { Board, isWin, move2square, removeStar } from "#src/board.js";
+import { Dir, Color, Pos, puzzleHeight, puzzleWidth } from "../src/puzzle.js";
+import { Square, out, squareIsOut } from "../src/square.js";
+import { Board, isWin, move2square, removeStar } from "../src/board.js";
 
 // Definition of the robot
 // The robot is defined by the square witch it is in and the direction witch is pointing
@@ -111,7 +111,14 @@ function boardShow(aBoard: Board, aRobot: Robot){
     for (let x = 0; x < puzzleWidth; x++) {
       const square = aBoard.board[y * puzzleWidth + x];
       if (square === aRobot.square) 
-        line +="X";
+        if (aRobot.dir === Dir.EAST)
+          line += ">";
+        else if (aRobot.dir === Dir.WEST)
+          line += "<";
+        else if (aRobot.dir === Dir.NORD)
+          line += "^";
+        else
+          line += "v";
       else
         line += square.isStar ? colorWithStar(square.color) : colorWithoutStar(square.color);
     }
