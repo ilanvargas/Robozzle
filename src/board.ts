@@ -47,7 +47,7 @@ function boardInit(aPuzzle: Puzzle): Board {
   const nbStars = boardFold((acc, curr) => (curr.toUpperCase() === curr) ? acc+1 : acc, 
                             0, aPuzzle.board);
 
-  const start = board[aPuzzle.robotCol*puzzleWidth + aPuzzle.robotRow];
+  const start = board[aPuzzle.robotRow*puzzleWidth + aPuzzle.robotCol];
 
   return {start: start, nbStars: nbStars, board: board};
 }
