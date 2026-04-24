@@ -1,6 +1,6 @@
-import * as bo from "#src/board.js";
-import * as ro from "#src/robot.js";
-import { Color } from "#src/puzzle.js";
+import * as bo from "../src/board.js";
+import * as ro from "../src/robot.js";
+// import { Color } from "#src/puzzle.js";
 // import { Puzzle, Color, Dir, puzzleWidth, puzzleHeight } from "../src/puzzle.js";
 const aPuzzle = {id:14, title:"Can you reach the stars?", about:"This puzzle is dedicated to those that enjoy bad puns.",
                 robotCol:1, robotRow:8, robotDir:3, subs:[10,2,2,0,0], allowedCommands:0,
@@ -8,7 +8,7 @@ const aPuzzle = {id:14, title:"Can you reach the stars?", about:"This puzzle is 
                 };
 
 const bor = bo.boardInit(aPuzzle);
-const robot = {square: bor.start, dir:3}
+const robot = {square: bor.start, dir:3};
 ro.boardShow(bor, robot);
 
 const puzzle = {
@@ -26,7 +26,7 @@ const puzzle = {
 
 console.log("\n");
 const bor2 = bo.boardInit(puzzle);    
-const robot2 = {square: bor2.start, dir:3}
+const robot2 = {square: bor2.start, dir:3};
 ro.boardShow(bor2,robot2);
 
 // describe('Board test suite', () => {
