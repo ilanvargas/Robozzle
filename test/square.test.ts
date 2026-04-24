@@ -1,6 +1,5 @@
-import { Color } from "../src/puzzle.js";
-import * as sq from "../src/square.js";
-// import { Color, Pos } from "./src/puzzle.js";
+import { Color } from "#src/puzzle.js";
+import * as sq from "#src/square.js";
 
 describe('Square test suite', () => {
     test('if square is out of the board', () => {
@@ -9,25 +8,12 @@ describe('Square test suite', () => {
     });
 
     test('if square is not out of the board', () => {
-        const square2 = {color: Color.BLUE, isStar: false};
+        const square2 = {color: Color.BLUE, isStar: false, position: {x: 1, y: 1}};
         expect(sq.squareIsOut(square2)).toBe(false);
     });
 
-    test('if square is star', () => {
-        const square2 = {color: Color.BLUE, isStar: true};
-        expect(sq.squareIsStar(square2)).toBe(true);
+    test('only square out triggers out of board', () => {
+        const out1 = {color: Color.NOCOLOR, isStar: false, position: {x: -1, y: -1}};
+        expect(sq.squareIsOut(out1)).toBe(false);
     });
-
-    test('color of the square', () => {
-        const square2 = {color: Color.BLUE, isStar: true};
-        expect(sq.squareColor(square2)).toBe(Color.BLUE);
-    });
-
-    test('position of the square', () => {
-        const square2 = {color: Color.BLUE, isStar: true, position: {x: 0, y: 0}};
-        expect(sq.squarePos(square2).x).toBe(0);
-        expect(sq.squarePos(square2).y).toBe(0);
-    });
-
-
 });

@@ -1,5 +1,5 @@
-import { Puzzle, Color, Dir, puzzleWidth, puzzleHeight } from "./puzzle.js";
-import { Square, out, squareIsOut, squareIsStar, squareColor, squarePos } from "./square.js";
+import { Puzzle, Color, Dir, puzzleWidth, puzzleHeight } from "#src/puzzle.js";
+import { Square, out, squareIsOut } from "#src/square.js";
 
 // The type board is defined by the board plus additionnal information
 // We specify the number of stars remaining and the square were the robot starts
@@ -11,7 +11,7 @@ type Board = {
 };
 
 // Creation of the first game board
-// Converts a Puzzle into a type Board
+// Converts a Puzzle into a type BoaCSMA/CDrd
 function boardInit(aPuzzle: Puzzle): Board {
   function boardMap(aFunc: (x: string, i: number) => Square, i: number, aStr: string)
     : Array<Square> {
@@ -57,13 +57,12 @@ function isWin(aBoard: Board): boolean {
   return aBoard.nbStars === 0;
 }
 
-
 // Returns the neighbour square on aDir direction
 // Will NOT create a new board; problem if we have a board modification
 // PRECOND: aSquare is on the board
 function move2square(aBoard: Board, aSquare: Square, aDir: Dir): Square {
   const isIn = (i: number) => i > 0 && i < aBoard.board.length;
-  const pos = squarePos(aSquare);
+  const pos = aSquare.position;
 
   switch (aDir) {
     case Dir.NORD:
@@ -92,8 +91,8 @@ function move2square(aBoard: Board, aSquare: Square, aDir: Dir): Square {
 function removeStar(aBoard: Board, aSquare: Square): Board {
   const squareNew = {
     isStar: false,
-    color: squareColor(aSquare),
-    position: squarePos(aSquare)
+    color: aSquare.color,
+    position: aSquare.position
   };
 
   return {

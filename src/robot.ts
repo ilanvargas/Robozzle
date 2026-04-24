@@ -1,6 +1,6 @@
-import { Dir, Color, Pos, puzzleHeight, puzzleWidth } from "./puzzle.js";
-import { Square, out, squareIsOut, squareIsStar, squareColor, squarePos } from "./square.js";
-import { Board, isWin, move2square, removeStar } from "./board.js";
+import { Dir, Color, Pos, puzzleHeight, puzzleWidth } from "#src/puzzle.js";
+import { Square, out, squareIsOut } from "#src/square.js";
+import { Board, isWin, move2square, removeStar } from "#src/board.js";
 
 // Definition of the robot
 // The robot is defined by the square witch it is in and the direction witch is pointing
@@ -11,19 +11,14 @@ type Robot = {
 
 // Attribute functions on robot based of square
 
-function generalSquare<K>(aFunction: (aSquare: Square) => K): (aRobot: Robot) => K {
+function generalSquare<K extends keyof Square>(key: K): (aRobot: Robot) => Square[K] {
   return (aRobot: Robot) => {
-    return aFunction(aRobot.square);
+    return aRobot.square[key];
   };
 }
-
-const robotIsFell = generalSquare(squareIsOut);
-
-const robotIsStar = generalSquare(squareIsStar);
-
-const robotColor = generalSquare(squareColor);
-
-const robotPos = generalSquare(squarePos);
+const robotIsStar = generalSquare('isStar');
+const robotColor = generalSquare('color');
+const robotIsFell = (aRobot: Robot) => squareIsOut(aRobot.square);
 
 // We wrap board and robot into game type
 type Game = {
@@ -35,6 +30,7 @@ type Game = {
 // ARGS: the current game (robot and board)
 // RETURNS: updated game
 // POSTCOND: the current game (and its attributes) are not modified
+
 function moveForward(g: Game): Game {
   const squareNew = move2square(g.board, g.robot.square, g.robot.dir);
   const robotNew: Robot = {
@@ -42,7 +38,7 @@ function moveForward(g: Game): Game {
     dir: g.robot.dir
   };
 
-  if (squareIsStar(squareNew))
+  if (squareNew.isStar)
     return {
       robot: robotNew,
       board: removeStar(g.board, g.robot.square)
@@ -81,7 +77,7 @@ const robotActionArray = [
 
 
 // TUI interpretation of board
-function boardShow(aBoard: Board, aSquare: Square){
+function boardShow(aBoard: Board, aRobot: Robot){
   function colorWithStar(aColor: number): string {
     switch (aColor) {
       case Color.BLUE:
@@ -114,7 +110,7 @@ function boardShow(aBoard: Board, aSquare: Square){
     let line = "";
     for (let x = 0; x < puzzleWidth; x++) {
       const square = aBoard.board[y * puzzleWidth + x];
-      if (square === aSquare) 
+      if (square === aRobot.square) 
         line +="X";
       else
         line += square.isStar ? colorWithStar(square.color) : colorWithoutStar(square.color);
@@ -123,5 +119,5 @@ function boardShow(aBoard: Board, aSquare: Square){
   }
 }
 
-export { Robot, robotIsFell, robotIsStar, robotColor, robotPos, Game, robotActionArray };
+export { Robot, robotIsFell, robotIsStar, robotColor, Game, robotActionArray };
 export { moveForward, turnRight, turnLeft, boardShow };

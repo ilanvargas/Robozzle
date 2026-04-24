@@ -1,52 +1,43 @@
-import { isWin, Board, boardInit } from "./board.js";
-import { squareColor } from "./square.js";
-import { Stack, stackIsEmpty, nil, cons } from "./stack.js";
-import { Puzzle } from "./puzzle.js";
-import { State, popStateStack } from "./gameState.js";
-import { robotIsFell } from "./robot.js";
+import { isWin, Board, boardInit } from "#src/board.js";
+import { Stack, stackIsEmpty, cons, nil } from "#src/stack.js";
+import { Puzzle } from "#src/puzzle.js";
+import { State, popStateStack } from "#src/gameState.js";
+import { robotIsFell } from "#src/robot.js";
 
-//const listFunc;
-
+// Returns first state based on puzzle and the funct list
 function initState(aPuzzle: Puzzle, listFunc: (state: State) => State[]): State {
   const board = boardInit(aPuzzle);
 
   return {
     robot: {
       square: board.start,
-      dir: 0
+      dir: aPuzzle.robotDir
     },
     board: board,
     stack: cons(listFunc, nil)
   };
 }
 
-
-
+// Game loop
 function loop(aState: State): void{
-  const state = aState;
-  // Continue to execute actions until stack empties or end conditions are met.
-  if (stackIsEmpty(state.stack) || isWin(state.board) || robotIsFell(state.robot)) {
+  if (stackIsEmpty(aState.stack) || isWin(aState.board) || robotIsFell(aState.robot)) {
+    // game end conditions
     return ;
   }
-  else {    // Pop the next action from the stack and execute it, then loop again.
-    const nextState = popStateStack(state);
+  else 
+  {    
+    // Pop the next action from the stack and execute it, then loop again.
+    const nextState = popStateStack(aState);
     loop(nextState);
     return;
   }
 }
 
+// Main function
+// Takes into arguement a puzzle and a list on function to execute game
 function main(aPuzzle: Puzzle, listFunc: (state: State) => State[]){
   const state = initState(aPuzzle, listFunc);
-  const finalState = loop(state);
-  console.log(finalState);
+  loop(state);
 }
-
-
-
-
-// const state = initState(aPuzzle);
-// const finalState = loop(state);
-// console.log(finalState);
-
 
 
