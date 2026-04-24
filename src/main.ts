@@ -1,11 +1,11 @@
-import { isWin, Board, boardInit } from "#src/board.js";
-import { Stack, stackIsEmpty, cons, nil } from "#src/stack.js";
-import { Puzzle } from "#src/puzzle.js";
-import { State, popStateStack } from "#src/gameState.js";
-import { robotIsFell } from "#src/robot.js";
+import { isWin, Board, boardInit } from "~src/board.js";
+import { Stack, stackIsEmpty, cons, nil } from "~src/stack.js";
+import { Puzzle } from "~src/puzzle.js";
+import { Action, State, Funct, popStateStack } from "~src/gameState.js";
+import { robotIsFell } from "~src/robot.js";
 
 // Returns first state based on puzzle and the funct list
-function initState(aPuzzle: Puzzle, listFunc: (state: State) => State[]): State {
+function initState(aPuzzle: Puzzle, arrayFunct: Array<Funct>): State {
   const board = boardInit(aPuzzle);
 
   return {
@@ -14,11 +14,13 @@ function initState(aPuzzle: Puzzle, listFunc: (state: State) => State[]): State 
       dir: aPuzzle.robotDir
     },
     board: board,
-    stack: cons(listFunc, nil)
+    stack: arrayFunct[0].reduce(
+      (acc: Stack<Action>, curr: Action) => cons(curr, acc), nil)
   };
 }
 
 // Game loop
+// Each loop changes game state
 function loop(aState: State): void{
   if (stackIsEmpty(aState.stack) || isWin(aState.board) || robotIsFell(aState.robot)) {
     // game end conditions
@@ -35,8 +37,8 @@ function loop(aState: State): void{
 
 // Main function
 // Takes into arguement a puzzle and a list on function to execute game
-function main(aPuzzle: Puzzle, listFunc: (state: State) => State[]){
-  const state = initState(aPuzzle, listFunc);
+function main(aPuzzle: Puzzle, arrayFunct: Array<Funct>){
+  const state = initState(aPuzzle, arrayFunct);
   loop(state);
 }
 

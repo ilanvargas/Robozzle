@@ -1,5 +1,5 @@
-import { Puzzle, Color, Dir, puzzleWidth, puzzleHeight } from "../src/puzzle.js";
-import { Square, out, squareIsOut } from "../src/square.js";
+import { Puzzle, Color, Dir, puzzleWidth, puzzleHeight } from "~src/puzzle.js";
+import { Square, out, squareIsOut } from "~src/square.js";
 
 // The type board is defined by the board plus additionnal information
 // We specify the number of stars remaining and the square were the robot starts
