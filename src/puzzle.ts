@@ -19,10 +19,10 @@ type Puzzle = {
 
 // Enumeration of the directions
 enum Dir {
-  NORD,
   EAST,
-  SOUTH,
   WEST,
+  NORD,
+  SOUTH,
   MAXDIRS
 };
 

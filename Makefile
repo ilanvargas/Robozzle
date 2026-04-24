@@ -5,7 +5,7 @@ build:
 
 test:
 	@echo "--- Exécution de tous les tests ---"
-	npx jest
+	npx jest --coverage
 	@echo "--- Tous les tests sont terminés ---"
 
 eslint:
@@ -14,6 +14,8 @@ eslint:
 serve:
 	npx parcel serve src/index.html
 
+run: 
+	node dist/test/board.test.js
 clean:
 	rm -rf dist/*
 
