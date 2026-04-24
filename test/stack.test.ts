@@ -1,4 +1,4 @@
-import * as st from "../src/stack.js";
+import * as st from "~src/stack.js";
 
 describe('Stack test suite', () => {
 
@@ -10,16 +10,6 @@ describe('Stack test suite', () => {
     test('Non-empty stack should not be empty', () => {
         const s = st.cons(1, st.nil);
         expect(st.stackIsEmpty(s)).toBe(false);
-    });
-    
-    test('Size of empty stack', () => {
-        const s = st.nil;
-        expect(st.stackSize(s)).toBe(0);
-    });
-
-    test('Size of non-empty stack', () => {
-        const s = st.cons(1, st.nil);
-        expect(st.stackSize(s)).toBe(1);
     });
 
     test('Test the head of a stack', () => {

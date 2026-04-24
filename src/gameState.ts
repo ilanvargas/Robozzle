@@ -1,7 +1,7 @@
-import { Stack, cons, head, tail } from "#src/stack.js";
-import { Puzzle } from "#src/puzzle.js";
-import { Board } from "#src/board.js";
-import { Robot, Game } from "#src/robot.js";
+import { Stack, cons, head, tail } from "~src/stack.js";
+import { Puzzle } from "~src/puzzle.js";
+import { Board } from "~src/board.js";
+import { Robot, Game } from "~src/robot.js";
 
 // Definition of a game state
 // The state is defined by the board, the robot and a stack witch the actions to do

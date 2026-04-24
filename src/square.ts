@@ -1,4 +1,4 @@
-import { Color, Pos } from "#src/puzzle.js";
+import { Color, Pos } from "~src/puzzle.js";
 
 // Definition of a square and the base of an non empty square
 // The square is the unit witch is composed the board

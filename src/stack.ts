@@ -3,12 +3,11 @@
 type PointedPair<T, U> = {
     head: T,
     cdr: U,
-    size: number
 };
-type Stack<T> = {size: number} | { head: T, cdr: Stack<T>, size: number };
+type Stack<T> = undefined | { head: T, cdr: Stack<T> };
 
 // Empty stack implementation
-const nil = {size: 0};
+const nil = undefined;
 
 // Push an element into a stack
 // ARGS:
@@ -18,7 +17,7 @@ const nil = {size: 0};
 // PRECOND: aCdr is the same type as the stack type (all aCdr elements are the same type)
 // POSTCOND: aCdr will not be modified
 function cons<T>(aCar: T, aCdr: Stack<T>): Stack<T> {
-    return { head: aCar, cdr: aCdr, size: aCdr.size+1 };
+    return { head: aCar, cdr: aCdr };
 }
 
 // Returns true if aStack is empty
@@ -38,9 +37,4 @@ function tail<T>(aStack: Stack<T>): Stack<T> {
     return (aStack as PointedPair<T, Stack<T>>).cdr;
 }
 
-// Returns size fo stack
-function stackSize<T>(aStack: Stack<T>): number {
-  return aStack.size;
-}
-
-export { Stack, nil, cons, stackIsEmpty, head, tail, stackSize };
+export { Stack, nil, cons, stackIsEmpty, head, tail };

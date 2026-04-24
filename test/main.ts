@@ -1,6 +1,6 @@
-import { Puzzle, Color } from "#src/puzzle.js"; 
-import { Robot, robotColor, moveForward, turnRight, turnLeft } from "#src/robot.js";
-import { Action, State, Funct, actionGame, actionFunct} from "#src/gameState.js";
+import { Puzzle, Color } from "~src/puzzle.js"; 
+import { Robot, robotColor, moveForward, turnRight, turnLeft } from "~src/robot.js";
+import { Action, State, Funct, actionGame, actionFunct} from "~src/gameState.js";
 
 const puzzle = {
   id: 330,
@@ -16,13 +16,13 @@ const puzzle = {
 
 const arrayFunct: Array<Funct> = [[], [], [], [], []];
 arrayFunct[0] = [
-    actionFunct(arrayFunct[2]),
+    actionFunct(arrayFunct[1]),
     actionGame(turnLeft),
     actionGame(moveForward)
 ];
 arrayFunct[1] = [
     actionGame(moveForward),
     actionGame(turnLeft, (r: Robot) => robotColor(r) === Color.RED),
-    actionFunct(arrayFunct[2], (r: Robot) => robotColor(r) === Color.BLUE),
+    actionFunct(arrayFunct[1], (r: Robot) => robotColor(r) === Color.BLUE),
     actionGame(moveForward)
 ];
