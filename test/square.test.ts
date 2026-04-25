@@ -1,5 +1,5 @@
-import { Color } from "~src/puzzle.js";
-import * as sq from "~src/square.js";
+import { Color } from "~src/puzzle";
+import * as sq from "~src/square";
 
 describe('Square test suite', () => {
     test('if square is out of the board', () => {
