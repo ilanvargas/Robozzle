@@ -21,8 +21,8 @@ type Puzzle = {
 enum Dir {
   EAST,
   WEST,
-  NORD,
   SOUTH,
+  NORD,
   MAXDIRS
 };
 

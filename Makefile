@@ -1,11 +1,11 @@
 TEST_BINARIES := $(wildcard ./test/*.js)
 
 build:
-	npx tsc
+	npx tsc -p tsconfig.json
 
 test:
 	@echo "--- Exécution de tous les tests ---"
-	npx jest --coverage
+	npx jest --coverage -c jest.config.ts
 	@echo "--- Tous les tests sont terminés ---"
 
 eslint:
@@ -15,7 +15,8 @@ serve:
 	npx parcel serve src/index.html
 
 run: 
-	node dist/test/board.test.js
+	npx tsx dist/test/board.test.js
+	npx tsx dist/test/robot.test.js
 
 clean:
 	rm -rf dist/*
