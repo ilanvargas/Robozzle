@@ -72,6 +72,20 @@ console.log("||     After moveForward:      ||");
 console.log("================================");
 boardShow(game3.board, game3.robot);
 
+const game4 = turnLeft(game3);
+console.log("================================");
+console.log("||     After turnLeft:       ||");
+console.log("================================");
+boardShow(game4.board, game4.robot);
+
+const game5 = turnLeft(game4);
+console.log("================================");
+console.log("||     After turnLeft:       ||");
+console.log("================================");
+boardShow(game5.board, game5.robot);
+
+
+
 console.log("================================");
 console.log("||             fin            ||")
 console.log("================================");

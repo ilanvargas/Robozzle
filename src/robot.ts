@@ -62,7 +62,7 @@ function turnRight(g: Game): Game {
 function turnLeft(g: Game): Game {
   const robotNew = {
     square: g.robot.square,
-    dir: (g.robot.dir - 1) % Dir.MAXDIRS
+    dir: (g.robot.dir - 1 + Dir.MAXDIRS) % Dir.MAXDIRS
   };
   
   return {robot: robotNew, board: g.board};
