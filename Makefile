@@ -16,6 +16,7 @@ serve:
 
 run: 
 	npx tsx dist/test/board.test.js
+	npx tsx dist/test/robot.test.js
 
 clean:
 	rm -rf dist/*
