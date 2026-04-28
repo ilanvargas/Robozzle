@@ -1,8 +1,8 @@
 import { boardShow, Robot } from '../src/robot.js';
 import { Board, boardInit } from '../src/board.js';
 //import { Dir } from '../src/dir.js';
-import { moveForward } from '../src/robot.js';
-import { puzzleHeight } from '../src/puzzle.js';
+import { moveForward, turnRight, turnLeft } from '../src/robot.js';
+import { puzzleHeight, puzzleWidth } from '../src/puzzle.js';
 
 
 const aPuzzle = {
@@ -41,3 +41,38 @@ for (let i = 1; i < puzzleHeight; i++) {
   console.log("================================");
   boardShow(game.board, game.robot);
 }
+
+let newstate = states[states.length - 1];
+const game = turnRight(newstate);
+console.log("================================");
+console.log("||     After turnRight:       ||");
+console.log("================================");
+boardShow(game.board, game.robot);
+
+let newstates = [game];
+for (let i = 1; i < puzzleWidth - 4; i++) {
+  const game = moveForward(newstates[newstates.length - 1]);
+    newstates.push(game);
+    console.log("================================");
+    console.log("||     After moveForward:      ||");
+    console.log("================================");
+    boardShow(game.board, game.robot);
+}
+
+let newstate2 = newstates[newstates.length - 1];
+const game = turnRight(newstate2);
+console.log("================================");
+console.log("||     After turnRight:       ||");
+console.log("================================");
+boardShow(game.board, game.robot);
+
+const game2 = moveForward(game);
+console.log("================================");
+console.log("||     After moveForward:      ||");
+console.log("================================");
+boardShow(game2.board, game2.robot);
+
+console.log("================================");
+console.log("||             fin            ||")
+console.log("================================");
+
