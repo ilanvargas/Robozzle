@@ -1,7 +1,7 @@
 TEST_BINARIES := $(wildcard ./test/*.js)
 
 build:
-	npx tsc
+	npx tsc -p tsconfig.json
 
 test:
 	@echo "--- Exécution de tous les tests ---"
@@ -15,7 +15,7 @@ serve:
 	npx parcel serve src/index.html
 
 run: 
-	node dist/test/board.test.js
+	npx tsc dist/test/board.test.js
 
 clean:
 	rm -rf dist/*
