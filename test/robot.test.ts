@@ -60,17 +60,17 @@ for (let i = 1; i < puzzleWidth - 4; i++) {
 }
 
 let newstate2 = newstates[newstates.length - 1];
-const game = turnRight(newstate2);
+const game2 = turnRight(newstate2);
 console.log("================================");
 console.log("||     After turnRight:       ||");
 console.log("================================");
-boardShow(game.board, game.robot);
+boardShow(game2.board, game2.robot);
 
-const game2 = moveForward(game);
+const game3 = moveForward(game2);
 console.log("================================");
 console.log("||     After moveForward:      ||");
 console.log("================================");
-boardShow(game2.board, game2.robot);
+boardShow(game3.board, game3.robot);
 
 console.log("================================");
 console.log("||             fin            ||")

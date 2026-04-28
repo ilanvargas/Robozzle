@@ -1,6 +1,6 @@
-import { Dir, Color, Pos, puzzleHeight, puzzleWidth } from "~src/puzzle";
-import { Square, out, squareIsOut } from "~src/square";
-import { Board, isWin, move2square, removeStar } from "~src/board";
+import { Dir, Color, Pos, puzzleHeight, puzzleWidth } from "../src/puzzle.js";
+import { Square, out, squareIsOut } from "../src/square.js";
+import { Board, isWin, move2square, removeStar } from "../src/board.js";
 
 // Definition of the robot
 // The robot is defined by the square witch it is in and the direction witch is pointing
