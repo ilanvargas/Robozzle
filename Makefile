@@ -5,7 +5,7 @@ build:
 
 test:
 	@echo "--- Exécution de tous les tests ---"
-	npx jest --coverage
+	npx jest --coverage -c jest.config.ts
 	@echo "--- Tous les tests sont terminés ---"
 
 eslint:
