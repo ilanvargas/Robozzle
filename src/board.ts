@@ -1,5 +1,5 @@
-import { Puzzle, Color, Dir, puzzleWidth, puzzleHeight } from "./puzzle.js";
-import { Square, out, squareIsOut, squareIsStar, squareColor, squarePos } from "./square.js";
+import { Puzzle, Color, Dir, puzzleWidth, puzzleHeight } from "~src/puzzle";
+import { Square, out, squareIsOut } from "~src/square";
 
 // The type board is defined by the board plus additionnal information
 // We specify the number of stars remaining and the square were the robot starts
@@ -11,7 +11,7 @@ type Board = {
 };
 
 // Creation of the first game board
-// Converts a Puzzle into a type Board
+// Converts a Puzzle into a type BoaCSMA/CDrd
 function boardInit(aPuzzle: Puzzle): Board {
   function boardMap(aFunc: (x: string, i: number) => Square, i: number, aStr: string)
     : Array<Square> {
@@ -47,53 +47,38 @@ function boardInit(aPuzzle: Puzzle): Board {
   const nbStars = boardFold((acc, curr) => (curr.toUpperCase() === curr) ? acc+1 : acc, 
                             0, aPuzzle.board);
 
-  const start = board[aPuzzle.robotCol*puzzleWidth + aPuzzle.robotRow];
+  const start = board[aPuzzle.robotRow*puzzleWidth + aPuzzle.robotCol];
 
   return {start: start, nbStars: nbStars, board: board};
 }
 
-// Returns true if player won
-function isWin(aBoard: Board) {
+// Returns true if player won (no more stars on board)
+function isWin(aBoard: Board): boolean {
   return aBoard.nbStars === 0;
 }
 
-// TUI interpretation of board
-function boardShow(aBoard: Board) {
-  function colorWithStar(aColor: number): string {
-    switch (aColor) {
-      case Color.BLUE:
-        return "B";
-      case Color.GREEN:
-        return "G";
-      case Color.RED:
-        return "R";
-      default:
-        return "?";
-    }
-  }
+// Returns the neighbour square on aDir direction
+// Will NOT create a new board; problem if we have a board modification
+// PRECOND: aSquare is on the board
+function move2square(aBoard: Board, aSquare: Square, aDir: Dir): Square {
+  const isIn = (i: number) => i > 0 && i < aBoard.board.length;
+  const pos = aSquare.position;
 
-  function colorWithoutStar(aColor: number): string {
-    switch (aColor) {
-      case Color.NOCOLOR:
-        return "#";
-      case Color.BLUE:
-        return "b";
-      case Color.GREEN:
-        return "g";
-      case Color.RED:
-        return "r";
-      default:
-        return "?";
-    }
-  }
-
-  for (let y = 0; y < puzzleHeight; y++) {
-    let line = "";
-    for (let x = 0; x < puzzleWidth; x++) {
-      const square = aBoard.board[y * puzzleWidth + x];
-      line += square.isStar ? colorWithStar(square.color) : colorWithoutStar(square.color);
-    }
-    console.log(line);
+  switch (aDir) {
+    case Dir.NORD:
+      const north = (pos.x-1)*puzzleWidth + pos.y;
+      return isIn(north) ? aBoard.board[north] : out;
+    case Dir.EAST:
+      const east = pos.x*puzzleWidth + pos.y+1;
+      return isIn(east) ? aBoard.board[east] : out;
+    case Dir.SOUTH:
+      const south = (pos.x+1)*puzzleWidth + pos.y;
+      return isIn(south) ? aBoard.board[south] : out;
+    case Dir.WEST:
+      const west = pos.x*puzzleWidth + pos.y-1;
+      return isIn(west) ? aBoard.board[west] : out;
+    default:
+      return out;
   }
 }
 
@@ -112,4 +97,30 @@ function removeStar(aSquare: Square, aBoard: Board): Board {
   return newaBoard;
 }
 
-export { Board, isWin, move2square, boardInit };
+// Returns a new board without a star on aSquare square
+// ARGS:
+// - aBoard:  board to be modified
+// - aSquare: square to star be removed on new square
+// RETURN:
+// - a new board
+function removeStar(aBoard: Board, aSquare: Square): Board {
+  const squareNew = {
+    isStar: false,
+    color: aSquare.color,
+    position: aSquare.position
+  };
+
+  return {
+    start: aBoard.start,
+    nbStars: aBoard.nbStars-1,
+    board: aBoard.board.map((e) => {
+      if (e === aSquare)
+        return squareNew;
+      else
+        return e;
+    })
+  }; 
+}
+
+export { Board, isWin, move2square, boardInit, removeStar };
+

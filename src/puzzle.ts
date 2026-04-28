@@ -1,9 +1,10 @@
 
 // Puzzle size
-const puzzleWidth = 12;
-const puzzleHeight = 10;
+const puzzleWidth = 16;
+const puzzleHeight = 12;
 
-// Definition of a puzzle raw
+// Definition of a "raw puzzle"
+// A puzzle so it's given by the json
 type Puzzle = {
   id: number,
   title: string,
@@ -12,16 +13,16 @@ type Puzzle = {
   robotRow: number,
   robotDir: number,
   subs: Array<number>,
-  allwedCommands: number,
+  allowedCommands: number,
   board: string
 }
 
 // Enumeration of the directions
 enum Dir {
-  NORD,
   EAST,
-  SOUTH,
   WEST,
+  NORD,
+  SOUTH,
   MAXDIRS
 };
 
@@ -34,7 +35,7 @@ enum Color {
   MAXCOLORS
 };
 
-// Position of the case 
+// Definition of a position
 interface Pos {
   x: number;
   y: number;

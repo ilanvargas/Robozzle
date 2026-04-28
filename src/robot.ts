@@ -1,9 +1,9 @@
-import { Dir, Color, Pos } from "./puzzle.js";
-import { Square, out, squareIsOut, squareIsStar, squareColor, squarePos } from "./square.js";
-import { Board, isWin, move2square } from "./board.js";
+import { Dir, Color, Pos, puzzleHeight, puzzleWidth } from "~src/puzzle";
+import { Square, out, squareIsOut } from "~src/square";
+import { Board, isWin, move2square, removeStar } from "~src/board";
 
-// Robot definiton
-// It is on a square (position int the board) and directed on a dir
+// Definition of the robot
+// The robot is defined by the square witch it is in and the direction witch is pointing
 type Robot = {
   square: Square;
   dir: Dir;
@@ -11,23 +11,14 @@ type Robot = {
 
 // Attribute functions on robot based of square
 
-function generalSquare<K>(aFunction: (aSquare: Square) => K): (aRobot: Robot) => K {
+function generalSquare<K extends keyof Square>(key: K): (aRobot: Robot) => Square[K] {
   return (aRobot: Robot) => {
-    return aFunction(aRobot.square);
+    return aRobot.square[key];
   };
 }
-
-const robotIsFell = generalSquare(squareIsOut);
-
-const robotIsStar = generalSquare(squareIsStar);
-
-const robotColor = generalSquare(squareColor);
-
-const robotPos = generalSquare(squarePos);
-
-// Action functions on robot
-// We create a new robot with the modifications
-// Can create a new board if modified
+const robotIsStar = generalSquare('isStar');
+const robotColor = generalSquare('color');
+const robotIsFell = (aRobot: Robot) => squareIsOut(aRobot.square);
 
 // We wrap board and robot into game type
 type Game = {
@@ -35,14 +26,28 @@ type Game = {
   board: Board;
 }
 
-// TODO: Crée un nouveau graph si le robot tombe sur une étoile
+// Action functions on robot
+// ARGS: the current game (robot and board)
+// RETURNS: updated game
+// POSTCOND: the current game (and its attributes) are not modified
+
 function moveForward(g: Game): Game {
+  const squareNew = move2square(g.board, g.robot.square, g.robot.dir);
   const robotNew: Robot = {
-    square: move2square(g.robot.square, g.robot.dir),
+    square: squareNew,
     dir: g.robot.dir
   };
 
-  return {robot: robotNew, board: g.board};
+  if (squareNew.isStar)
+    return {
+      robot: robotNew,
+      board: removeStar(g.board, g.robot.square)
+    };
+  else
+    return {
+      robot: robotNew, 
+      board: g.board
+    };
 }
 
 function turnRight(g: Game): Game {
@@ -63,10 +68,63 @@ function turnLeft(g: Game): Game {
   return {robot: robotNew, board: g.board};
 }
 
+// Regrouping all of the robot's actions
 const robotActionArray = [
   moveForward,
   turnRight,
   turnLeft
 ];
 
-export { Robot, robotIsFell, robotIsStar, robotColor, robotPos, Game, robotActionArray };
+
+// TUI interpretation of board
+function boardShow(aBoard: Board, aRobot: Robot){
+  function colorWithStar(aColor: number): string {
+    switch (aColor) {
+      case Color.BLUE:
+        return "B";
+      case Color.GREEN:
+        return "G";
+      case Color.RED:
+        return "R";
+      default:
+        return "?";
+    }
+  }
+
+  function colorWithoutStar(aColor: number): string {
+    switch (aColor) {
+      case Color.NOCOLOR:
+        return "#";
+      case Color.BLUE:
+        return "b";
+      case Color.GREEN:
+        return "g";
+      case Color.RED:
+        return "r";
+      default:
+        return "?";
+    }
+  }
+
+  for (let y = 0; y < puzzleHeight; y++) {
+    let line = "";
+    for (let x = 0; x < puzzleWidth; x++) {
+      const square = aBoard.board[y * puzzleWidth + x];
+      if (square === aRobot.square) 
+        if (aRobot.dir === Dir.EAST)
+          line += ">";
+        else if (aRobot.dir === Dir.WEST)
+          line += "<";
+        else if (aRobot.dir === Dir.NORD)
+          line += "^";
+        else
+          line += "v";
+      else
+        line += square.isStar ? colorWithStar(square.color) : colorWithoutStar(square.color);
+    }
+    console.log(line);
+  }
+}
+
+export { Robot, robotIsFell, robotIsStar, robotColor, Game, robotActionArray };
+export { moveForward, turnRight, turnLeft, boardShow };
