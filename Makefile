@@ -15,7 +15,7 @@ serve:
 	npx parcel serve src/index.html
 
 run: 
-	npx tsc dist/test/board.test.js
+	npx tsx dist/test/board.test.js
 
 clean:
 	rm -rf dist/*
