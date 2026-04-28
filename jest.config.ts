@@ -10,6 +10,8 @@ const jestConfig = {
     ],
     moduleNameMapper: {
         '^(\\.{1,2}/.*)\\.js$': '$1',
+        '^~src/(.*)$': '<rootDir>/src/$1.ts',
+        '^~test/(.*)$': '<rootDir>/test/$1.ts'
     },
     roots: [ "src", "test" ]
 };
