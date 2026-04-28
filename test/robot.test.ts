@@ -32,7 +32,7 @@ const aGame = {
 console.log("Initial board:");
 boardShow(aGame.board, aGame.robot);
 
-let states = [aGame];
+const states = [aGame];
 for (let i = 1; i < puzzleHeight; i++) {
   const game = moveForward(states[states.length - 1]);
   states.push(game);

@@ -1,6 +1,6 @@
-import { Puzzle, Color } from "~src/puzzle.js"; 
-import { Robot, robotColor, moveForward, turnRight, turnLeft } from "~src/robot.js";
-import { Action, State, Funct, actionGame, actionFunct} from "~src/gameState.js";
+import { Puzzle, Color } from "~src/puzzle"; 
+import { Robot, robotColor, moveForward, turnRight, turnLeft } from "~src/robot";
+import { Action, State, Funct, actionGame, actionFunct} from "~src/gameState";
 
 const puzzle = {
   id: 330,

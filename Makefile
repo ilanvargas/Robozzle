@@ -16,6 +16,7 @@ serve:
 
 run: 
 	node dist/test/board.test.js
+
 clean:
 	rm -rf dist/*
 

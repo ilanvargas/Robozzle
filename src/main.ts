@@ -1,8 +1,8 @@
-import { isWin, Board, boardInit } from "~src/board.js";
-import { Stack, stackIsEmpty, cons, nil } from "~src/stack.js";
-import { Puzzle } from "~src/puzzle.js";
-import { Action, State, Funct, popStateStack } from "~src/gameState.js";
-import { robotIsFell } from "~src/robot.js";
+import { isWin, Board, boardInit } from "~src/board";
+import { Stack, stackIsEmpty, cons, nil } from "~src/stack";
+import { Puzzle } from "~src/puzzle";
+import { Action, State, Funct, popStateStack } from "~src/gameState";
+import { robotIsFell } from "~src/robot";
 
 // Returns first state based on puzzle and the funct list
 function initState(aPuzzle: Puzzle, arrayFunct: Array<Funct>): State {

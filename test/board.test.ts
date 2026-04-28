@@ -1,6 +1,6 @@
-import * as bo from "~src/board.js";
-import * as ro from "~src/robot.js";
-import { Color } from "~src/puzzle.js";
+import * as bo from "~src/board";
+import * as ro from "~src/robot";
+import { Color } from "~src/puzzle";
 
 // import { Puzzle, Color, Dir, puzzleWidth, puzzleHeight } from "../src/puzzle.js";
 const aPuzzle = {id:14, title:"Can you reach the stars?", about:"This puzzle is dedicated to those that enjoy bad puns.",
