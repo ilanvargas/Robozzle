@@ -84,8 +84,6 @@ console.log("||     After turnLeft:       ||");
 console.log("================================");
 boardShow(game5.board, game5.robot);
 
-
-
 console.log("================================");
 console.log("||             fin            ||")
 console.log("================================");

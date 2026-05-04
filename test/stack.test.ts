@@ -41,7 +41,8 @@ describe('Tests on head', () => {
 describe('Tests on tail', () => {
     test('tail of a stack', () => {
         const s = st.cons(1, st.cons(2, st.nil));
-        expect(st.tail(s)).toBe(st.cons(2, st.nil));
+        const s1 = st.cons(1, s);
+        expect(st.tail(s1)).toBe(s);
     });
 });
 
