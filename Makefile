@@ -22,4 +22,4 @@ run:
 clean:
 	rm -rf dist/*
 
-.PHONY: build test eslint serve clean
+.PHONY: all build test eslint serve clean

@@ -1,8 +1,8 @@
 import { isWin, Board, boardInit } from "~src/board";
-import { Stack, stackIsEmpty, cons, nil } from "~src/stack";
+import { Stack, stackIsEmpty, cons, nil, isOverStack } from "~src/stack";
 import { Puzzle } from "~src/puzzle";
 import { Action, State, Funct, popStateStack } from "~src/gameState";
-import { robotIsFell } from "~src/robot";
+import { robotIsFell, boardShow } from "~src/robot";
 
 // Returns first state based on puzzle and the funct list
 function initState(aPuzzle: Puzzle, arrayFunct: Array<Funct>): State {
@@ -22,7 +22,10 @@ function initState(aPuzzle: Puzzle, arrayFunct: Array<Funct>): State {
 // Game loop
 // Each loop changes game state
 function loop(aState: State): void{
-  if (stackIsEmpty(aState.stack) || isWin(aState.board) || robotIsFell(aState.robot)) {
+  if (stackIsEmpty(aState.stack) || 
+      isWin(aState.board) || 
+      robotIsFell(aState.robot) ||
+      isOverStack(aState.stack)) {
     // game end conditions
     return ;
   }
@@ -31,6 +34,7 @@ function loop(aState: State): void{
     // Pop the next action from the stack and execute it, then loop again.
     const nextState = popStateStack(aState);
     loop(nextState);
+    boardShow(nextState.board, nextState.robot);
     return;
   }
 }
@@ -39,7 +43,11 @@ function loop(aState: State): void{
 // Takes into arguement a puzzle and a list on function to execute game
 function main(aPuzzle: Puzzle, arrayFunct: Array<Funct>){
   const state = initState(aPuzzle, arrayFunct);
+  boardShow(state.board, state.robot);
   loop(state);
+
+  if (isWin(state.board))
+    console.log(`You won game`);
 }
 
-
+export { main };

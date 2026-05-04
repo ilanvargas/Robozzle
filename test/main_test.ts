@@ -1,6 +1,7 @@
 import { Puzzle, Color } from "~src/puzzle"; 
 import { Robot, robotColor, moveForward, turnRight, turnLeft } from "~src/robot";
-import { Action, State, Funct, actionGame, actionFunct} from "~src/gameState";
+import { Action, State, Funct, actionGame, actionFunct } from "~src/gameState";
+import { main } from "~src/main";
 
 const puzzle = {
   id: 330,
@@ -26,3 +27,5 @@ arrayFunct[1] = [
     actionFunct(arrayFunct[1], (r: Robot) => robotColor(r) === Color.BLUE),
     actionGame(moveForward)
 ];
+
+main(puzzle, arrayFunct);
