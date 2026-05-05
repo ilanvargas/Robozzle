@@ -1,0 +1,42 @@
+[{
+    "id":325,"title":"Return of Robo 2","about":"",
+    "robotCol":5,"robotRow":6,"robotDir":0,"subs":[9,0,0,0,0],"allowedCommands":0,
+    "board":" RBB     BBR     B B     B B     BBBBB BBBBB       B B B B         BBBBGBB           B B           BBgBBBB         B B B B       BBBBB BBBBB     B B     B B     RBB     BBR                    "
+  },{
+    "id":326,"title":"Regular Holes","about":"",
+    "robotCol":7,"robotRow":6,"robotDir":0,"subs":[5,10,0,0,0],"allowedCommands":1,
+    "board":"       BB            BBBB          BBBB BB       BBBB BBBB       BB BBBB BB       BBBB BBBB       BB BBbB BB       BBBB BBBB       BB BBBB          BBBB            BB                          "
+  },{
+    "id":327,"title":"Seven Squares","about":"How many are important?",
+    "robotCol":7,"robotRow":6,"robotDir":0,"subs":[10,0,0,0,0],"allowedCommands":7,
+    "board":"    BbbB           gbggbggg        gb  bBbbB       gBbbbb gb      Bbbbrrb gb      bg brrbbbB      bg bbbbBg       BbbBb  bg        gggbggbg           BbbB                                      "
+  },{
+    "id":328,"title":"Replication Engine","about":"",
+    "robotCol":1,"robotRow":10,"robotDir":0,"subs":[4,10,5,3,0],"allowedCommands":5,
+    "board":" GGGGGGGGGGGGGGG B   G   G   G   B   G   G   G  RBR GGG GGG GGG BRR GGG GGG GGG B   G   G   G   BRR GGG GGG GGG RBR GGG GGG GGG BRR GGG GGG GGG B   G   G   G   BgR GGG GGG GGG RBR GGG GGG GGG "
+  },{
+    "id":329,"title":"Layered Sheets","about":"",
+    "robotCol":10,"robotRow":5,"robotDir":3,"subs":[4,10,10,0,0],"allowedCommands":4,
+    "board":"RRRRR GGGGGGGGGGG G G G        GG G G G GGGGGG GG G G G G    G GG G G G G BB G GG G G G G gG G GG G G      G G GG G BGGGGGGB G GG G          G GG GGGGGGGGGGGG GG              GGGGGGGGGGGGGGGGG"
+  },{
+    "id":330,"title":"Learning Stack","about":"",
+    "robotCol":1,"robotRow":11,"robotDir":3,"subs":[3,4,0,0,0],"allowedCommands":0,
+    "board":" rbbbbbbbbbbb    b          B    b               b               b               b               b               b               b               b               b               b              "
+  },{
+    "id":331,"title":"Err","about":"Mmmm... Smooth and Menthol",
+    "robotCol":2,"robotRow":11,"robotDir":0,"subs":[7,3,3,2,0],"allowedCommands":0,
+    "board":"          rrr     rrrrrrrrrrr   b rrbrrrrrrbr  bb rrrbrrrrbrrr bb rrbrbrrbrbrr b brrbrrrrrrbrrb   rrrrrrrrrrrr    rrrrrrrrrrrr    rrrbbbbbbrrr    rrrrrrrrrrrr       b    b       bbbb    bbbB  "
+  },{
+    "id":332,"title":"Power-of-2 generator","about":"Don't count the greens",
+    "robotCol":2,"robotRow":11,"robotDir":0,"subs":[3,10,6,0,0],"allowedCommands":0,
+    "board":"                                  gbbbbbbbbbbg    b          b    b          b    bR         b    b         Rb    gbbbbbbbB  b               b               b    RR R   R   b   rbbbbbbbbbbbg  "
+  },{
+    "id":333,"title":"Learning Stack 2","about":"",
+    "robotCol":0,"robotRow":11,"robotDir":3,"subs":[3,5,0,0,0],"allowedCommands":0,
+    "board":"RBBBBBBBBBBB    B          B    B RBBB     B    B B  B     B    B B  B     GBBBBB BBBBBBG      BB    B  B      BB    B  B      BB    B  B      BB    B  B      BB    B  B      Bb    B  BBBBBBBR"
+  },{
+    "id":334,"title":"Learning Stack 3","about":"",
+    "robotCol":0,"robotRow":6,"robotDir":0,"subs":[3,4,3,2,0],"allowedCommands":0,
+    "board":"      RB             BBBB           BB  BB         BB  B BB       BB  BB  BB     BB  BB    BB   bB  BB      BB      BB      BB       BB    BB         BB  BB           BBBB             BR      "
+  }
+]
