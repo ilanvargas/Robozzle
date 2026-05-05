@@ -17,24 +17,23 @@ describe('Board test suite', () => {
         robotDir: Dir.EAST,
         subs: [0, 0, 0, 0, 0],
         allowedCommands: 0,
-        board: "b.b...B.........."
+        board: " rBbbbbbbbbbR                                                                                                                                                                                  "
     };
 
     // Test data: board with stars
     // B = uppercase means star
     // b = lowercase means no star
     const starPuzzle = {
-        id: 2,
-        title: "Star Test",
-        about: "A board with stars",
-        robotCol: 0,
-        robotRow: 0,
-        robotDir: Dir.EAST,
-        subs: [0, 0, 0, 0, 0],
-        allowedCommands: 0,
-        board: "r.R......................"
+    id:330,
+    title:"Learning Stack",
+    about:"",
+    robotCol:1,
+    robotRow:11,
+    robotDir:3,
+    subs:[3,4,0,0,0],
+    allowedCommands:0,
+    board:" rbbbbbbbbbbb    b          B    b               b               b               b               b               b               b               b               b               b              "
     };
-
     describe('boardInit', () => {
         test('should initialize a board from a puzzle', () => {
             const board = bo.boardInit(simplePuzzle);
