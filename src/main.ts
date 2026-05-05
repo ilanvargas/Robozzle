@@ -3,6 +3,7 @@ import { Stack, stackIsEmpty, cons, nil, isOverStack } from "~src/stack";
 import { Puzzle } from "~src/puzzle";
 import { Action, State, Funct, popStateStack } from "~src/gameState";
 import { robotIsFell, boardShow } from "~src/robot";
+import { readFileSync } from 'node:fs';
 
 // Returns first state based on puzzle and the funct list
 function initState(aPuzzle: Puzzle, arrayFunct: Array<Funct>): State {
@@ -73,4 +74,10 @@ function main(aPuzzle: Puzzle, arrayFunct: Array<Funct>){
     throw new Error("Unexpected state");
 }
 
-export { main };
+function getPuzzles() {   // FIXME : the path should be a parameter
+  const jsonData = readFileSync('share/puzzles.json').toString();
+  return JSON.parse(jsonData);
+}
+
+
+export { main, getPuzzles };
