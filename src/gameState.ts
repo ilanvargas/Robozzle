@@ -55,10 +55,11 @@ function actionGame(aFunGame: (g: Game) => Game, cond?: (g: Robot) => boolean): 
 // - aFunc          : a funct 
 // - cond(optionnal): condition on robot
 // RETURN: an action
-function actionFunct(aFunc: Funct, cond?: (g: Robot) => boolean): Action {
+function actionFunct(aFunctTrunk: () => Funct, cond?: (g: Robot) => boolean): Action {
   return (aState: State) => {
+    const aFunct = aFunctTrunk();
     if (cond === undefined || cond(aState.robot)) {
-      const stackNew = aFunc.
+      const stackNew = aFunct.
         reduce((acc: Stack<Action>, curr: Action) => cons(curr, acc), 
                tail(aState.stack));
 

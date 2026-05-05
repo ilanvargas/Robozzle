@@ -1,6 +1,6 @@
-import { Dir, Color, Pos, puzzleHeight, puzzleWidth } from "~src/puzzle";
-import { Square, out, squareIsOut } from "~src/square";
-import { Board, isWin, move2square, removeStar } from "~src/board";
+import { Dir, Color, Pos, puzzleHeight, puzzleWidth } from "../src/puzzle.js";
+import { Square, out, squareIsOut } from "../src/square.js";
+import { Board, isWin, move2square, removeStar } from "../src/board.js";
 
 // Definition of the robot
 // The robot is defined by the square witch it is in and the direction witch is pointing
@@ -62,7 +62,7 @@ function turnRight(g: Game): Game {
 function turnLeft(g: Game): Game {
   const robotNew = {
     square: g.robot.square,
-    dir: (g.robot.dir - 1) % Dir.MAXDIRS
+    dir: (g.robot.dir - 1 + Dir.MAXDIRS) % Dir.MAXDIRS
   };
   
   return {robot: robotNew, board: g.board};
