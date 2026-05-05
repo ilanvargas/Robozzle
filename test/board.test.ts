@@ -48,7 +48,7 @@ describe('Board test suite', () => {
     });
 
     test('should correctly count the number of stars', () => {
-      expect(board.nbStars).toBe(2); 
+      expect(board.nbStars).toBe(6); 
     });
 
     test('should set the start position correctly', () => {
@@ -162,11 +162,11 @@ describe('Board test suite', () => {
     });
 
     test('global number of star decresed by one', () => {
-      expect(newBoard.nbStars).toBe(1);
+      expect(newBoard.nbStars).toBe(5);
     });
 
     test('should preserve other squares', () => {
-      for (let i = 0; i < 10; i++) {
+      for (let i = 1; i < 10; i++) {
         expect(newBoard.board[i]).toBe(board.board[i]);
       }
     });

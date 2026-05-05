@@ -21,33 +21,56 @@ function initState(aPuzzle: Puzzle, arrayFunct: Array<Funct>): State {
 
 // Game loop
 // Each loop changes game state
-function loop(aState: State): void{
+// Returns last game state
+function loop(aState: State, turn: number): State{
   if (stackIsEmpty(aState.stack) || 
       isWin(aState.board) || 
       robotIsFell(aState.robot) ||
       isOverStack(aState.stack)) {
     // game end conditions
-    return ;
+    return aState;
   }
   else 
   {    
     // Pop the next action from the stack and execute it, then loop again.
     const nextState = popStateStack(aState);
-    loop(nextState);
+
+    console.log(``);
+    console.log(`Turn ${turn+1}`);
     boardShow(nextState.board, nextState.robot);
-    return;
+    console.log(nextState.stack);
+
+    return loop(nextState, turn+1);
   }
 }
 
 // Main function
 // Takes into arguement a puzzle and a list on function to execute game
 function main(aPuzzle: Puzzle, arrayFunct: Array<Funct>){
-  const state = initState(aPuzzle, arrayFunct);
-  boardShow(state.board, state.robot);
-  loop(state);
+  const newArrayFunct = [
+    arrayFunct[0].slice().reverse(),
+    arrayFunct[1].slice().reverse(),
+    arrayFunct[2].slice().reverse(),
+    arrayFunct[3].slice().reverse(),
+    arrayFunct[4].slice().reverse(),
+  ];
 
-  if (isWin(state.board))
+  const state = initState(aPuzzle, newArrayFunct);
+
+  console.log(state.stack);
+  boardShow(state.board, state.robot);
+  const lastState = loop(state, 0);
+
+  if (isWin(lastState.board))
     console.log(`You won game`);
+  else if (stackIsEmpty(lastState.stack))
+    console.log(`No more actions`);
+  else if (robotIsFell(lastState.robot))
+    console.log(`Robot fell out of board`);
+  else if (isOverStack(lastState.stack))
+    console.log(`Overstack`);
+  else
+    throw new Error("Unexpected state");
 }
 
 export { main };

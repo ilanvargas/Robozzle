@@ -24,7 +24,7 @@ function boardInit(aPuzzle: Puzzle): Board {
   function boardFold(aFunc: (acc: number, curr: string) => number, init: number, aStr: string)
     : number {
     if (aStr === "")
-      return 0;
+      return init;
     else
       return boardFold(aFunc, aFunc(init, aStr.charAt(0)), aStr.slice(1));
   }
@@ -44,8 +44,11 @@ function boardInit(aPuzzle: Puzzle): Board {
     }
   }, 0, aPuzzle.board);
 
-  const nbStars = boardFold((acc, curr) => (curr.toUpperCase() === curr) ? acc+1 : acc, 
-                            0, aPuzzle.board);
+  const nbStars = boardFold(
+    (acc, curr) => (curr >= 'A' && curr <= 'Z') ? acc + 1 : acc,
+    0,
+    aPuzzle.board
+  );
 
   const start = board[aPuzzle.robotRow*puzzleWidth + aPuzzle.robotCol];
 

@@ -15,17 +15,18 @@ const puzzle = {
   board:" rbbbbbbbbbbb    b          B    b               b               b               b               b               b               b               b               b               b              "
 };
 
-const arrayFunct: Array<Funct> = [[], [], [], [], []];
-arrayFunct[0] = [
-    actionFunct(arrayFunct[1]),
-    actionGame(turnLeft),
+const arrayFunct: Array<Funct> = [[
+    actionFunct(() => arrayFunct[1]),
+    actionGame(turnRight),
     actionGame(moveForward)
-];
-arrayFunct[1] = [
+  ],
+  [
     actionGame(moveForward),
-    actionGame(turnLeft, (r: Robot) => robotColor(r) === Color.RED),
-    actionFunct(arrayFunct[1], (r: Robot) => robotColor(r) === Color.BLUE),
+    actionGame(turnRight, (r: Robot) => robotColor(r) === Color.RED),
+    actionFunct(() => arrayFunct[1], (r: Robot) => robotColor(r) === Color.BLUE),
     actionGame(moveForward)
+  ],
+  [], [], []
 ];
 
 main(puzzle, arrayFunct);
