@@ -5,7 +5,7 @@ all: build
 build:
 	npx tsc -p tsconfig.json
 
-test: build
+test: 
 	npx tsx dist/test/robot_test.js
 	@echo "--- Exécution test jester ---"
 	npx jest --coverage -c jest.config.ts

@@ -42,14 +42,14 @@ for (let i = 1; i < puzzleHeight; i++) {
   boardShow(game.board, game.robot);
 }
 
-let newstate = states[states.length - 1];
+const newstate = states[states.length - 1];
 const game = turnRight(newstate);
 console.log("================================");
 console.log("||     After turnRight:       ||");
 console.log("================================");
 boardShow(game.board, game.robot);
 
-let newstates = [game];
+const newstates = [game];
 for (let i = 1; i < puzzleWidth - 4; i++) {
   const game = moveForward(newstates[newstates.length - 1]);
     newstates.push(game);
@@ -59,7 +59,7 @@ for (let i = 1; i < puzzleWidth - 4; i++) {
     boardShow(game.board, game.robot);
 }
 
-let newstate2 = newstates[newstates.length - 1];
+const newstate2 = newstates[newstates.length - 1];
 const game2 = turnRight(newstate2);
 console.log("================================");
 console.log("||     After turnRight:       ||");
@@ -85,6 +85,6 @@ console.log("================================");
 boardShow(game5.board, game5.robot);
 
 console.log("================================");
-console.log("||             fin            ||")
+console.log("||             fin            ||");
 console.log("================================");
 
