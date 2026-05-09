@@ -38,5 +38,9 @@
     "id":334,"title":"Learning Stack 3","about":"",
     "robotCol":0,"robotRow":6,"robotDir":0,"subs":[3,4,3,2,0],"allowedCommands":0,
     "board":"      RB             BBBB           BB  BB         BB  B BB       BB  BB  BB     BB  BB    BB   bB  BB      BB      BB      BB       BB    BB         BB  BB           BBBB             BR      "
-  }
+  },{
+  "id":644,"title":"Right on red","about":"",
+  "robotCol":7,"robotRow":6,"robotDir":0,"subs":[5,4,0,0,0],"allowedCommands":0,
+  "board":"                                                     gbbbbbbg        b      b        b      b        b bbbbbg        b             B grg           b  b            gbbg                         "
+}
 ]

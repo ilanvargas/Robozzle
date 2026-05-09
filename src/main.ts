@@ -74,9 +74,10 @@ function main(aPuzzle: Puzzle, arrayFunct: Array<Funct>){
     throw new Error("Unexpected state");
 }
 
-function getPuzzles() {   // FIXME : the path should be a parameter
-  const jsonData = readFileSync('share/puzzles.json').toString();
-  return JSON.parse(jsonData);
+function getPuzzles(id: number): Puzzle{   // FIXME : the path should be a parameter
+  const jsonData = readFileSync('share/puzzles_extract.json').toString();
+  const allPuzzles= JSON.parse(jsonData);
+  return allPuzzles.find((p:Puzzle) => p.id === id);
 }
 
 

@@ -21,8 +21,7 @@ const arrayFunct: Array<Funct> = [[
 /*
 -- Exemple de comment on peut récupérer un puzzle a partir de son ID --
 */
-const allPuzzles = getPuzzles();
-const puzzle1 = allPuzzles.find((p:Puzzle) => p.id === 330);
+const puzzle1 = getPuzzles(329);
 if (puzzle1) {
   console.log("Puzzle trouvé :", puzzle1.title);
   // Ici aStr sera bien la longue chaîne de caractères, et charAt(0) marchera !
@@ -35,8 +34,8 @@ if (puzzle1) {
     robot: robot,
     board: aBoard
   };
-  // boardShow(aBoard, aGame.robot);
-  main(puzzle1, arrayFunct);
+  boardShow(aBoard, aGame.robot);
+  // main(puzzle1, arrayFunct);
 } else {
   console.error("Erreur : Aucun puzzle trouvé avec cet ID.");
 }
