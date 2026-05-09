@@ -1,159 +1,437 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Robot Programming Visualizer</title>
-    <style>
-      body {
-          background-color: #404040;
-          color: #eee;
-          font-family: Helvetica, Arial;
-      }
-      div#visualizer {
-          font: 25px/25px Arial;
-          width: 680px; height: 720px;
-          background: #333;
-          margin: auto;
-      }
-      #visualizer table {
-          border-collapse: collapse;
-          margin: auto;
-      }
-      #visualizer_board td {
-          width: 40px; height: 40px;
-          text-align: center;
-          padding: 0px;
-          font-family: 'robots';
-          font-size:24px;
-      }
-      #visualizer_board td.red_tile {
-          border: 1px solid gray;
-          background: linear-gradient(to top left, #ff0000, #993333);
-      }
-      #visualizer_board td.green_tile {
-          border: 1px solid gray;
-          background: linear-gradient(to top left, #00aa44, #337733);
-      }
-      #visualizer_board td.blue_tile {
-          border: 1px solid gray;
-          background: linear-gradient(to top left, #0044ff, #333399);
-      }
-      #visualizer_buttons {
-          text-align: center;
-      }
-      @font-face {
-          font-family: 'robots';
-          src: url('./projRobotFont.ttf') format('truetype');
-      }
-    </style>
-  </head>
-  <body>
-    <div id="visualizer">
-      <table>
-        <tbody id="visualizer_board">
-        </tbody>
-      </table>
-      <div id="visualizer_buttons">
-        <button id="button_move">Move me !</button>
-      </div>
+<head>
+  <meta charset="utf-8">
+  <title>Robot Puzzle</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;600;800&display=swap');
+
+    :root {
+      --bg:        #0d0f14;
+      --surface:   #161923;
+      --panel:     #1e2330;
+      --border:    #2a3040;
+      --accent:    #00e5ff;
+      --accent2:   #ff4d6d;
+      --gold:      #ffd166;
+      --green:     #06d6a0;
+      --text:      #e0e6f0;
+      --muted:     #5a6480;
+      --red-tile:  #6b1a2a;
+      --green-tile:#0d4a32;
+      --blue-tile: #0d2a6b;
+      --red-star:  #ff4d6d;
+      --green-star:#06d6a0;
+      --blue-star: #00e5ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Exo 2', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Header ─────────────────────────────────── */
+    header {
+      width: 100%;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    header h1 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+    header span.sub {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ── Puzzle Selector ─────────────────────────── */
+    #selector-bar {
+      width: 100%;
+      max-width: 1100px;
+      padding: 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #selector-bar label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+    #puzzle-id-input {
+      width: 80px;
+      padding: 8px 12px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 14px;
+    }
+    #puzzle-id-input:focus { outline: none; border-color: var(--accent); }
+
+    #load-btn {
+      padding: 8px 20px;
+      background: transparent;
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      color: var(--accent);
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: background 0.2s, color 0.2s;
+    }
+    #load-btn:hover { background: var(--accent); color: var(--bg); }
+
+    #puzzle-info {
+      flex: 1;
+      text-align: right;
+    }
+    #puzzle-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--gold);
+    }
+    #puzzle-about {
+      font-size: 12px;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 2px;
+    }
+
+    /* ── Main Layout ──────────────────────────────── */
+    #main {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      gap: 24px;
+      padding-bottom: 32px;
+    }
+
+    /* ── Board ────────────────────────────────────── */
+    #board-wrap {
+      flex-shrink: 0;
+    }
+
+    #board-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    #visualizer_board {
+      border-collapse: collapse;
+      display: block;
+    }
+
+    #visualizer_board td {
+      width: 36px;
+      height: 36px;
+      text-align: center;
+      padding: 0;
+      font-size: 18px;
+      border: 1px solid rgba(255,255,255,0.04);
+      position: relative;
+    }
+
+    .void-tile  { background: #0a0c10; }
+    .red-tile   { background: var(--red-tile); }
+    .green-tile { background: var(--green-tile); }
+    .blue-tile  { background: var(--blue-tile); }
+
+    .star-marker {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    .robot-cell {
+      font-size: 20px;
+      filter: drop-shadow(0 0 6px var(--accent));
+    }
+
+    /* ── Right panel ─────────────────────────────── */
+    #right-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    /* ── Functions editor ────────────────────────── */
+    #functions-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    #functions-panel h3 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .func-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .func-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 13px;
+      color: var(--accent);
+      width: 28px;
+      flex-shrink: 0;
+    }
+    .func-slots {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    .slot {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.15s, background 0.15s;
+      position: relative;
+      font-family: 'Share Tech Mono', monospace;
+    }
+    .slot:hover { border-color: var(--accent); background: #222b3a; }
+    .slot.active-instr {
+      border-color: var(--gold);
+      box-shadow: 0 0 8px var(--gold);
+    }
+
+    /* color filter dot on slot */
+    .slot .color-dot {
+      position: absolute;
+      bottom: 3px;
+      right: 3px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+    }
+
+    /* ── Palette popup ──────────────────────────── */
+    #palette {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+    }
+    .palette-row {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 5px;
+    }
+    .palette-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-family: 'Share Tech Mono', monospace;
+      color: white;
+      font-weight: bold;
+      transition: transform 0.1s, opacity 0.1s;
+    }
+    .palette-btn:hover { transform: scale(1.12); }
+    .palette-clear {
+      background: #2a2a2a !important;
+      color: #888 !important;
+      border: 1px solid #444 !important;
+    }
+
+    /* ── Controls ────────────────────────────────── */
+    #controls {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .ctrl-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s, transform 0.1s;
+    }
+    .ctrl-btn:hover { border-color: var(--accent); background: #1a2233; }
+    .ctrl-btn:active { transform: scale(0.92); }
+    #btn-run   { color: var(--green); }
+    #btn-step  { color: var(--accent); }
+    #btn-back  { color: var(--gold); }
+    #btn-reset { color: var(--accent2); }
+
+    #step-counter {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 13px;
+      color: var(--muted);
+      margin-left: auto;
+    }
+    #step-counter span { color: var(--text); }
+
+    #status-msg {
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    .status-won   { background: rgba(6,214,160,0.15); color: var(--green); border: 1px solid var(--green); }
+    .status-lost  { background: rgba(255,77,109,0.15); color: var(--accent2); border: 1px solid var(--accent2); }
+    .status-play  { background: rgba(0,229,255,0.1);  color: var(--accent);  border: 1px solid var(--accent); }
+
+    /* ── Stack display ───────────────────────────── */
+    #stack-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      flex: 1;
+      overflow-y: auto;
+      max-height: 320px;
+    }
+    #stack-panel h3 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .stack-frame {
+      background: var(--surface);
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      border-left: 3px solid var(--border);
+    }
+    .stack-frame.active { border-left-color: var(--gold); }
+    .stack-frame-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .stack-frame-instrs {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .stack-instr {
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: white;
+    }
+    .stack-instr.cursor { outline: 2px solid var(--gold); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>⬡ Robot Puzzle</h1>
+  <span class="sub">Functional stack machine</span>
+</header>
+
+<div id="selector-bar">
+  <label>Puzzle ID</label>
+  <input id="puzzle-id-input" type="number" value="0" min="0" />
+  <button id="load-btn">Load</button>
+  <div id="puzzle-info">
+    <div id="puzzle-title">—</div>
+    <div id="puzzle-about"></div>
+  </div>
+</div>
+
+<div id="main">
+  <div id="board-wrap">
+    <div id="board-container">
+      <table><tbody id="visualizer_board"></tbody></table>
     </div>
-    <script type="text/javascript">
-      const icons = {
-          robotEast:   { string: '\uEE00', color: 'pink' },
-          robotSouth:  { string: '\uEE01', color: 'pink' },
-          robotWest:   { string: '\uEE02', color: 'pink' },
-          robotNorth:  { string: '\uEE03', color: 'pink' },
-          star:        { string: '\uEE04', color: 'yellow' },
-          disk:        { string: '\uEE05', color: 'red' },
-          box:         { string: '\uEE06', color: 'red' },
-          flash:       { string: '\uEE07', color: 'red' },
-          heart:       { string: '\uEE08', color: 'red' },
-          heartBroken: { string: '\uEE09', color: 'red' },
-          lock:        { string: '\uEE0A', color: 'red' },
-          lockOpen:    { string: '\uEE0B', color: 'red' },
-          key:         { string: '\uEE0C', color: 'red' },
-          droplet:     { string: '\uEE0D', color: 'red' },
-          rocket:      { string: '\uEE0E', color: 'red' },
-          empty:       { string: '\uEE0F', color: 'red' },
-      };
-      
-      const aPuzzle = {
-          board: [ '                ',
-                   '                ',
-                   '                ',
-                   '     gbbbbbbg   ',
-                   '     b      b   ',
-                   '     b      b   ',
-                   '     b bbbbbg   ',
-                   '     b          ',
-                   '   B grg        ',
-                   '   b  b         ',
-                   '   gbbg         ',
-                   '                ' ],
-          robot: { x: 6, y: 7, dir: 0 },
-      };
-      
-      const robotID = "robot";
-      
-      function removeRobot() {
-          const rCell = document.getElementById(robotID);
-          rCell.removeAttribute('id');
-          rCell.removeAttribute('style');
-          rCell.innerText = icons.empty.string;
-      }
-      
-      function addRobot(aBoardID, aRobot) {
-          let aBoard = document.getElementById(aBoardID)
-          let aCell  = aBoard.rows[aRobot.x].cells[aRobot.y];
-          let anIcon = icons[Object.keys(icons)[aRobot.dir]];
-          aCell.id = robotID;
-          aCell.innerText = anIcon.string;
-          aCell.style.color = anIcon.color;
-      }
-      
-      function addStar(aCell) {
-          aCell.innerText = icons.star.string;
-          aCell.style.color = icons.star.color
-      }
-      
-      function fillBoard(aBoardID, aPuzzle) {
-          const tbody = document.getElementById(aBoardID);
-          aPuzzle.board.forEach((aLine) => {
-              const newRow = tbody.insertRow();
-              aLine.split('').forEach((aChar) => {
-                  const newCell = newRow.insertCell();
-                  switch (aChar) {
-                  case 'r': newCell.className += " red_tile"; break;
-                  case 'g': newCell.className += " green_tile"; break;
-                  case 'b': newCell.className += " blue_tile"; break;
-                  case 'R': newCell.className += " red_tile"; addStar(newCell); break;
-                  case 'G': newCell.className += " green_tile"; addStar(newCell); break;
-                  case 'B': newCell.className += " blue_tile"; addStar(newCell); break;
-                  }
-              });
-          });
-      }
-      
-      function getRandomInt(max) {
-          return Math.floor(Math.random() * max);
-      }
-      
-      function moveRobotRandomly(aBoardID) {
-          removeRobot();
-          addRobot(aBoardID,
-                   {x: getRandomInt(12),
-                    y: getRandomInt(16),
-                    dir: getRandomInt(4)});
-      }
-      
-      window.onload = () => {
-          let aBoardID = "visualizer_board";
-          fillBoard(aBoardID, aPuzzle);
-          addRobot(aBoardID, aPuzzle.robot);
-          document.
-              getElementById("button_move").
-              addEventListener("click", () => moveRobotRandomly(aBoardID));
-      };
-    </script>
-  </body>
+  </div>
+
+  <div id="right-panel">
+    <div id="functions-panel">
+      <h3>Programme</h3>
+      <div id="func-rows"></div>
+    </div>
+
+    <div id="controls">
+      <button class="ctrl-btn" id="btn-back"  title="Step back">⬅</button>
+      <button class="ctrl-btn" id="btn-step"  title="Step forward">➔</button>
+      <button class="ctrl-btn" id="btn-run"   title="Play / Pause">▶</button>
+      <button class="ctrl-btn" id="btn-reset" title="Reset">↺</button>
+      <div id="step-counter">Step <span id="step-num">0</span></div>
+      <div id="status-msg" class="status-play">READY</div>
+    </div>
+
+    <div id="stack-panel">
+      <h3>Call Stack</h3>
+      <div id="stack-display"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Palette popup -->
+<div id="palette"></div>
+
+<script type="module" src="./funcs.ts"></script>
+</body>
 </html>
