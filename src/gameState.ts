@@ -1,4 +1,4 @@
-import { Stack, cons, head, tail } from "~src/stack";
+import { Stack, cons, head, tail, call } from "~src/stack";
 import { Puzzle } from "~src/puzzle";
 import { Board } from "~src/board";
 import { Robot, Game } from "~src/robot";
@@ -59,9 +59,16 @@ function actionFunct(aFunctTrunk: () => Funct, cond?: (g: Robot) => boolean): Ac
   return (aState: State) => {
     const aFunct = aFunctTrunk();
     if (cond === undefined || cond(aState.robot)) {
+      // function call
+      const stackCall =
+        (aFunct.length > 0)
+          ? call(aFunct[0], tail(aState.stack))
+          : tail(aState.stack);
+
       const stackNew = aFunct.
+        slice(1).
         reduce((acc: Stack<Action>, curr: Action) => cons(curr, acc), 
-               tail(aState.stack));
+               stackCall);
 
       return {
         robot: aState.robot,
