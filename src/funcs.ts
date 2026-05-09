@@ -1,667 +1,466 @@
-/**
- * funcs.ts — UI controller
- **/
+import { Dir, Color, puzzleWidth, puzzleHeight, Puzzle } from "~src/puzzle";
+import { Square, out, squareIsOut } from "~src/square";
+import { Board, boardInit, isWin, move2square, removeStar } from "~src/board";
+import { Robot, moveForward, turnRight, turnLeft } from "~src/robot";
+import { Stack, nil, cons, stackIsEmpty, head, tail, call, isOverStack } from "~src/stack";
+import { Action, State, Funct, actionGame, actionFunct } from "~src/gameState";
 
-import { boardInit, isWin, Board }                        from "~src/board";
-import { Puzzle, Dir, Color }                             from "~src/puzzle";
-import { Action, State, Funct, popStateStack,
-         actionGame, actionFunct, verifyArrayFunc }       from "~src/gameState";
-import { Robot, robotIsFell, moveForward,
-         turnRight, turnLeft }                            from "~src/robot";
-import { Stack, nil, cons, call as stackCall,
-         stackIsEmpty, head, tail, isOverStack }          from "~src/stack";
-import { Square, out, squareIsOut }                       from "~src/square";
+// ─── Types UI ──────────────────────────────────────────────────────────────────
 
-// ─── Types ────────────────────────────────────────────────────────────
+type InstrDef = {
+  action: "MOVE" | "LEFT" | "RIGHT" | "TURN" | "CALL_1" | "CALL_2" | "CALL_3" | "CALL_4" | "CALL_5" | "VOID";
+  color: Color;
+};
 
-/** Color filter for an instruction */
-type FilterColor = Color.RED | Color.GREEN | Color.BLUE | Color.NOCOLOR; // NOCOLOR = any
+type Program = {
+  F1: InstrDef[];
+  F2: InstrDef[];
+  F3: InstrDef[];
+  F4: InstrDef[];
+  F5: InstrDef[];
+};
 
-/** An instruction of the program edited in the UI */
-interface UiInstr {
-  kind:   "MOVE" | "LEFT" | "RIGHT" | "TURN" | "CALL_1" | "CALL_2" | "CALL_3" | "CALL_4" | "CALL_5" | "VOID";
-  filter: FilterColor;
+type UIState = {
+  puzzle: Puzzle;
+  program: Program;
+  gameState: State | null;
+  history: State[];
+  status: "idle" | "running" | "won" | "lost";
+  steps: number;
+};
+
+// ─── Conversion programme → Funct[] ────────────────────────────────────────────
+
+function colorCondition(c: Color): ((r: Robot) => boolean) | undefined {
+  if (c === Color.NOCOLOR) return undefined;
+  return (robot: Robot) => robot.square.color === c;
 }
 
-/** UI program: 5 function slots */
-type UiProgram = UiInstr[][];
-
-/** Snapshot for the "back" button */
-interface Snapshot {
-  state: State;
-  step:  number;
+function instrDefToAction(instr: InstrDef, getFuncts: () => Funct[]): Action {
+  const cond = colorCondition(instr.color);
+  switch (instr.action) {
+    case "MOVE":   return actionGame(moveForward, cond);
+    case "LEFT":   return actionGame(turnLeft,    cond);
+    case "RIGHT":  return actionGame(turnRight,   cond);
+    case "TURN":   return actionGame(
+      (g) => { const r = turnRight(g); return turnRight(r); }, cond);
+    case "CALL_1": return actionFunct(() => getFuncts()[0], cond);
+    case "CALL_2": return actionFunct(() => getFuncts()[1], cond);
+    case "CALL_3": return actionFunct(() => getFuncts()[2], cond);
+    case "CALL_4": return actionFunct(() => getFuncts()[3], cond);
+    case "CALL_5": return actionFunct(() => getFuncts()[4], cond);
+    case "VOID":
+    default:
+      return (s: State) => ({ ...s, stack: tail(s.stack) });
+  }
 }
 
-// ─── Constants ───────────────────────────────────────────────────────────────
+function programToFuncts(program: Program): Funct[] {
+  const keys: (keyof Program)[] = ["F1", "F2", "F3", "F4", "F5"];
+  let functs: Funct[] = keys.map(() => []);
+  const getFuncts = () => functs;
 
-const PUZZLE_URL  = "../share/puzzles.json";
-const BOARD_ID    = "visualizer_board";
-const ROBOT_ID    = "robot-cell";
-const MAX_STEPS   = 2000;
-
-const ROBOT_GLYPHS: Partial<Record<Dir, string>> = {
-  [Dir.NORD]:  "▲",
-  [Dir.EAST]:  "▶",
-  [Dir.SOUTH]: "▼",
-  [Dir.WEST]:  "◀",
-};
-
-const ACTION_SYMBOLS: Record<UiInstr["kind"], string> = {
-  MOVE:   "↑",
-  LEFT:   "↰",
-  RIGHT:  "↱",
-  TURN:   "↓",
-  CALL_1: "F1",
-  CALL_2: "F2",
-  CALL_3: "F3",
-  CALL_4: "F4",
-  CALL_5: "F5",
-  VOID:   "",
-};
-
-const COLOR_BG: Record<FilterColor, string> = {
-  [Color.NOCOLOR]: "#3a3a4a",
-  [Color.RED]:     "#8b1a2a",
-  [Color.GREEN]:   "#0a4a28",
-  [Color.BLUE]:    "#0a2a6b",
-};
-
-const COLOR_ACCENT: Record<FilterColor, string> = {
-  [Color.NOCOLOR]: "#888",
-  [Color.RED]:     "#ff4d6d",
-  [Color.GREEN]:   "#06d6a0",
-  [Color.BLUE]:    "#00e5ff",
-};
-
-// ─── Global State ────────────────────────────────────────────────────────────
-
-let puzzles:    Puzzle[]    = [];
-let puzzle:     Puzzle | null = null;
-let uiProgram:  UiProgram   = Array.from({ length: 5 }, () => []);
-let gameState:  State | null = null;
-let history:    Snapshot[]  = [];   // pour le bouton "reculer"
-let stepCount:  number      = 0;
-let runTimer:   number | null = null;
-
-// current slot selection for the palette
-let selectedSlot: { fi: number; si: number; el: HTMLElement } | null = null;
-
-// ─── Puzzle Loading ──────────────────────────────────────────────────────────
-
-async function fetchPuzzles(): Promise<Puzzle[]> {
-  const r = await fetch(PUZZLE_URL);
-  if (!r.ok) throw new Error(`Fetch failed: ${r.status} ${r.url}`);
-  const raw: unknown[] = await r.json();
-  // Le JSON contient des strings de copyright en tête — on filtre
-  return raw.filter((x): x is Puzzle =>
-    typeof x === "object" && x !== null && "id" in x
+  functs = keys.map((k) =>
+    program[k]
+      .filter((i) => i.action !== "VOID")
+      .map((i) => instrDefToAction(i, getFuncts))
+      .reverse()
   );
-}
-
-// ─── Init / Reset ────────────────────────────────────────────────────────────
-
-function loadPuzzleById(id: number): void {
-  const p = puzzles.find(x => x.id === id);
-  if (!p) { alert(`Puzzle #${id} introuvable.`); return; }
-  puzzle = p;
-  uiProgram = puzzle.subs.map(size => Array.from({ length: size }, (): UiInstr => ({ kind: "VOID", filter: Color.NOCOLOR })));
-  // Initialize execution when puzzle changes
-  resetExecution();
-  renderPuzzleInfo();
-  renderBoard(puzzle.board);
-  renderFunctions();
-  buildPalette();
-}
-
-function resetExecution(): void {
-  stopRun();
-  if (!puzzle) return;
-  const board = boardInit(puzzle);
-  const initStack: Stack<Action> = nil;
-
-  gameState = {
-    robot: { square: board.start, dir: puzzle.robotDir as Dir },
-    board,
-    stack: initStack,
-  };
-
-  // Build Funct[] from uiProgram and push F1 onto the stack
-  const functs = buildFuncts();
-  gameState = {
-    ...gameState,
-    stack: buildInitStack(functs[0]),
-  };
-
-  history    = [];
-  stepCount  = 0;
-  renderAll();
-}
-
-/** Convertit le UiProgram en tableaux de Action (Funct[]) */
-function buildFuncts(): Funct[] {
-  // Tableaux mutables pour permettre les références circulaires (F1 appelle F1)
-  const functs: Funct[] = Array.from({ length: 5 }, () => []);
-
-  functs.forEach((_, fi) => {
-    const slots = uiProgram[fi] ?? [];
-    // actionFunct attend les Funct reversées (comme main.ts le fait)
-    functs[fi] = slots
-      .filter(s => s.kind !== "VOID")
-      .map(s => buildAction(s, functs))
-      .reverse();
-  });
 
   return functs;
 }
 
-function buildAction(instr: UiInstr, functs: Funct[]): Action {
-  const cond = colorCondition(instr.filter);
+// ─── Init état de jeu ──────────────────────────────────────────────────────────
 
-  switch (instr.kind) {
-    case "MOVE":   return actionGame(g => moveForward(g),  cond);
-    case "LEFT":   return actionGame(g => turnLeft(g),     cond);
-    case "RIGHT":  return actionGame(g => turnRight(g),    cond);
-    case "TURN":   return actionGame(g => ({ robot: { ...g.robot, dir: ((g.robot.dir + 2) % 4) as Dir }, board: g.board }), cond);
-    case "CALL_1": return actionFunct(() => functs[0], cond);
-    case "CALL_2": return actionFunct(() => functs[1], cond);
-    case "CALL_3": return actionFunct(() => functs[2], cond);
-    case "CALL_4": return actionFunct(() => functs[3], cond);
-    case "CALL_5": return actionFunct(() => functs[4], cond);
-    default:       return (s: State) => ({ ...s, stack: tail(s.stack) });
-  }
-}
-
-/** Condition de couleur : null = toujours vrai */
-function colorCondition(filter: FilterColor): ((r: Robot) => boolean) | undefined {
-  if (filter === Color.NOCOLOR) return undefined;
-  return (r: Robot) => r.square.color === filter;
-}
-
-function buildInitStack(f1: Funct): Stack<Action> {
-  // f1 est déjà reversée par buildFuncts — on empile directement
-  // head de la stack = dernière instruction empilée = première de F1
-  return f1.reduce<Stack<Action>>(
-    (acc, a) => cons(a, acc),
-    nil
+function buildInitialState(puzzle: Puzzle, program: Program): State {
+  const board = boardInit(puzzle);
+  const functs = programToFuncts(program);
+  const f1 = functs[0];
+  const stack: Stack<Action> = f1.reduce(
+    (acc, action) => cons(action, acc),
+    nil as Stack<Action>
   );
+  return {
+    robot: { square: board.start, dir: puzzle.robotDir },
+    board,
+    stack,
+  };
 }
 
-// ─── Rendering ──────────────────────────────────────────────────────────────
+// ─── Step ──────────────────────────────────────────────────────────────────────
 
-function renderAll(): void {
-  if (!puzzle || !gameState) return;
-  renderBoard(gameState.board.board.map(sq => squareToChar(sq, puzzle!.board)).join(""));
-  placeRobot(gameState.robot);
-  renderStack();
-  updateControls();
+type StepResult =
+  | { kind: "ok"; state: State }
+  | { kind: "won" }
+  | { kind: "lost"; reason: string };
+
+function stepOnce(state: State): StepResult {
+  if (isOverStack(state.stack))
+    return { kind: "lost", reason: "Stack overflow (récursion trop profonde)" };
+  if (stackIsEmpty(state.stack))
+    return { kind: "lost", reason: "Programme terminé sans résoudre le puzzle" };
+
+  const action = head(state.stack);
+  const next = action(state);
+
+  if (squareIsOut(next.robot.square))
+    return { kind: "lost", reason: "Le robot est sorti du plateau" };
+  if (isWin(next.board))
+    return { kind: "won" };
+
+  return { kind: "ok", state: next };
 }
 
-/** Reconstruct a board string from current squares (to reflect collected stars) */
-function squareToChar(sq: Square, originalBoard: string): string {
-  if (squareIsOut(sq)) return " ";
-  const idx = sq.position.x * 16 + sq.position.y; // puzzleWidth = 16
-  const orig = originalBoard[idx] ?? " ";
-  if (sq.isStar) return orig; // uppercase = star still there
-  // If original was a star (uppercase) but sq.isStar = false → return lowercase
-  if (orig >= 'A' && orig <= 'Z') return orig.toLowerCase();
-  return orig;
-}
+// ─── Rendu du plateau ──────────────────────────────────────────────────────────
 
-function renderPuzzleInfo(): void {
-  if (!puzzle) return;
-  (document.getElementById("puzzle-title")  as HTMLElement).innerText = puzzle.title;
-  (document.getElementById("puzzle-about")  as HTMLElement).innerText = puzzle.about;
-  (document.getElementById("puzzle-id-input") as HTMLInputElement).value = String(puzzle.id);
-}
+const ROBOT_CHARS: Record<number, string> = {
+  [Dir.EAST]:  "→",
+  [Dir.SOUTH]: "↓",
+  [Dir.WEST]:  "←",
+  [Dir.NORD]:  "↑",
+};
 
-function renderBoard(board: string): void {
-  const tbody = document.getElementById(BOARD_ID) as HTMLTableSectionElement;
+function renderBoard(puzzle: Puzzle, state: State | null): void {
+  const tbody = document.getElementById("game-board") as HTMLTableSectionElement;
+  if (!tbody) return;
   tbody.innerHTML = "";
 
-  const W = 16; // puzzleWidth
-  const H = 12; // puzzleHeight
-  for (let row = 0; row < H; row++) {
-    const tr = tbody.insertRow();
-    for (let col = 0; col < W; col++) {
-      const ch = board[row * W + col] ?? " ";
-      const td = tr.insertCell();
-      td.style.width = td.style.height = "36px";
-      td.style.textAlign = "center";
-      td.style.padding = "0";
-      td.style.position = "relative";
-      td.style.border = "1px solid rgba(255,255,255,0.04)";
+  const board = state?.board ?? boardInit(puzzle);
+  const robotSquare = state?.robot.square ?? null;
+  const robotDir = state?.robot.dir ?? puzzle.robotDir;
 
-      switch (ch.toLowerCase()) {
-        case "r": td.className = "red-tile";   td.style.background = "#6b1a2a"; break;
-        case "g": td.className = "green-tile"; td.style.background = "#0d4a32"; break;
-        case "b": td.className = "blue-tile";  td.style.background = "#0d2a6b"; break;
-        default:  td.style.background = "#0a0c10"; break;
+  for (let row = 0; row < puzzleHeight; row++) {
+    const tr = tbody.insertRow();
+    for (let col = 0; col < puzzleWidth; col++) {
+      const sq = board.board[row * puzzleWidth + col];
+      const td = tr.insertCell();
+
+      if (squareIsOut(sq)) {
+        td.className = "empty-cell";
+        continue;
       }
 
-      // Étoile
-      if (ch >= "A" && ch <= "Z") {
-        const star = document.createElement("div");
-        star.style.cssText = "position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;pointer-events:none;";
-        star.innerText = "★";
-        const starColors: Record<string, string> = { R: "#ff4d6d", G: "#06d6a0", B: "#00e5ff" };
-        star.style.color = starColors[ch] ?? "#ffd166";
-        td.appendChild(star);
+      const colorName = sq.color === Color.RED ? "red"
+                      : sq.color === Color.GREEN ? "green"
+                      : sq.color === Color.BLUE ? "blue"
+                      : "empty-cell";
+      td.className = colorName + (sq.isStar ? " star-cell" : "");
+
+      if (sq === robotSquare) {
+        td.classList.add("robot-cell");
+        td.textContent = ROBOT_CHARS[robotDir] ?? "?";
+      } else if (sq.isStar) {
+        td.textContent = "★";
       }
     }
   }
 }
 
-function placeRobot(robot: Robot): void {
-  // Supprimer le précédent
-  document.getElementById(ROBOT_ID)?.removeAttribute("id");
-  const old = document.querySelector(".robot-rendered");
-  if (old) {
-    old.classList.remove("robot-rendered");
-    old.innerHTML = old.innerHTML.replace(/<span[^>]*robot[^>]*>.*?<\/span>/g, "");
-  }
+// ─── Rendu des fonctions ───────────────────────────────────────────────────────
 
-  if (squareIsOut(robot.square)) return;
+const ACTION_SYMBOLS: Record<string, string> = {
+  MOVE: "↑", LEFT: "↰", RIGHT: "↱", TURN: "↕",
+  CALL_1: "F1", CALL_2: "F2", CALL_3: "F3", CALL_4: "F4", CALL_5: "F5",
+  VOID: "",
+};
 
-  const { x, y } = robot.square.position;
-  const tbody = document.getElementById(BOARD_ID) as HTMLTableSectionElement;
-  const row = tbody.rows[x];
-  if (!row) return;
-  const cell = row.cells[y];
-  if (!cell) return;
+const COLOR_BG: Record<number, string> = {
+  [Color.NOCOLOR]: "#3a3a4a",
+  [Color.RED]:     "#992222",
+  [Color.GREEN]:   "#1e7a1e",
+  [Color.BLUE]:    "#1545a8",
+};
 
-  cell.id = ROBOT_ID;
-  cell.classList.add("robot-rendered");
+const COLOR_LABEL: Record<number, string> = {
+  [Color.NOCOLOR]: "Tous",
+  [Color.RED]:     "Rouge",
+  [Color.GREEN]:   "Vert",
+  [Color.BLUE]:    "Bleu",
+};
 
-  const span = document.createElement("span");
-  span.style.cssText = "position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:20px;color:#00e5ff;filter:drop-shadow(0 0 6px #00e5ff);z-index:2;pointer-events:none;";
-  span.innerText = ROBOT_GLYPHS[robot.dir] ?? "●";
-  cell.appendChild(span);
-}
-
-// ─── Functions / Slots ───────────────────────────────────────────────────────
+let uiState: UIState;
+let selectedSlot: { fi: number; ii: number; el: HTMLButtonElement } | null = null;
 
 function renderFunctions(): void {
-  const container = document.getElementById("func-rows")!;
+  const container = document.getElementById("functions-container") as HTMLDivElement;
+  if (!container) return;
   container.innerHTML = "";
-  if (!puzzle) return;
-  // Render each function with its slots
 
-  puzzle.subs.forEach((size, fi) => {
+  uiState.puzzle.subs.forEach((size, fi) => {
     if (size === 0) return;
+    const fKey = `F${fi + 1}` as keyof Program;
+    const instrs = uiState.program[fKey];
+
     const row = document.createElement("div");
     row.className = "func-row";
-    row.style.cssText = "display:flex;align-items:center;gap:8px;margin-bottom:10px;";
 
-    const label = document.createElement("div");
+    const label = document.createElement("span");
     label.className = "func-label";
-    label.style.cssText = "font-family:'Share Tech Mono',monospace;font-size:13px;color:#00e5ff;width:28px;flex-shrink:0;";
-    label.innerText = `F${fi + 1}`;
+    label.textContent = `F${fi + 1}`;
     row.appendChild(label);
 
-    const slots = document.createElement("div");
-    slots.style.cssText = "display:flex;gap:5px;flex-wrap:wrap;";
-
-    for (let si = 0; si < size; si++) {
+    for (let ii = 0; ii < size; ii++) {
+      const instr = instrs[ii] ?? { action: "VOID", color: Color.NOCOLOR };
       const btn = document.createElement("button");
-      btn.className = "slot";
-      btn.style.cssText = `
-        width:36px;height:36px;border-radius:5px;
-        border:1px solid #2a3040;background:#161923;
-        color:#e0e6f0;font-size:12px;cursor:pointer;
-        display:flex;align-items:center;justify-content:center;
-        transition:border-color 0.15s,background 0.15s;
-        position:relative;font-family:'Share Tech Mono',monospace;
-      `;
-      btn.dataset.fi = String(fi);
-      btn.dataset.si = String(si);
-      updateSlotDisplay(btn, fi, si);
-      btn.addEventListener("click", () => openPalette(btn, fi, si));
-      slots.appendChild(btn);
-      // Slot created for instruction
+      btn.className = "slot-btn" + (selectedSlot?.fi === fi && selectedSlot?.ii === ii ? " selected" : "");
+      btn.style.background = instr.action !== "VOID" ? COLOR_BG[instr.color] : "#252530";
+      btn.textContent = ACTION_SYMBOLS[instr.action] ?? "";
+      btn.title = `F${fi + 1}[${ii + 1}]`;
+      btn.addEventListener("click", () => openPalette(fi, ii, btn));
+      row.appendChild(btn);
     }
 
-    row.appendChild(slots);
     container.appendChild(row);
   });
 }
 
-function updateSlotDisplay(btn: HTMLElement, fi: number, si: number): void {
-  const instr = uiProgram[fi]?.[si];
-  if (!instr || instr.kind === "VOID") {
-    btn.innerText = "";
-    btn.style.background = "#161923";
-    btn.style.borderColor = "#2a3040";
-    // remove dot
-    const dot = btn.querySelector(".cdot");
-    if (dot) dot.remove();
-    return;
-  }
+// ─── Palette ───────────────────────────────────────────────────────────────────
 
-  btn.innerText = ACTION_SYMBOLS[instr.kind];
-  btn.style.background = COLOR_BG[instr.filter];
-  btn.style.borderColor = COLOR_ACCENT[instr.filter];
+const ALL_ACTIONS: (keyof typeof ACTION_SYMBOLS)[] = [
+  "MOVE", "LEFT", "RIGHT", "TURN",
+  "CALL_1", "CALL_2", "CALL_3", "CALL_4", "CALL_5",
+];
 
-  // dot couleur
-  let dot = btn.querySelector(".cdot") as HTMLElement | null;
-  if (!dot) {
-    dot = document.createElement("div");
-    dot.className = "cdot";
-    dot.style.cssText = "position:absolute;bottom:3px;right:3px;width:5px;height:5px;border-radius:50%;";
-    btn.appendChild(dot);
-  }
-  dot.style.background = instr.filter === Color.NOCOLOR ? "transparent" : COLOR_ACCENT[instr.filter];
-}
+const ALL_COLORS: Color[] = [Color.NOCOLOR, Color.RED, Color.GREEN, Color.BLUE];
 
-// ─── Palette ─────────────────────────────────────────────────────────────────
+function buildPalettePopup(): void {
+  let pal = document.getElementById("palette-popup");
+  if (pal) pal.remove();
 
-const KINDS: UiInstr["kind"][] = ["MOVE","LEFT","RIGHT","TURN","CALL_1","CALL_2","CALL_3","CALL_4","CALL_5"];
-const FILTERS: FilterColor[] = [Color.NOCOLOR, Color.RED, Color.GREEN, Color.BLUE];
+  pal = document.createElement("div");
+  pal.id = "palette-popup";
+  pal.style.display = "none";
 
-function buildPalette(): void {
-  const pal = document.getElementById("palette")!;
-  pal.innerHTML = "";
-  if (!puzzle) return;
+  const availableActions = ALL_ACTIONS.filter((a) => {
+    if (!a.startsWith("CALL_")) return true;
+    const fi = parseInt(a.slice(-1)) - 1;
+    return uiState.puzzle.subs[fi] > 0;
+  });
 
-  FILTERS.forEach(filter => {
+  ALL_COLORS.forEach((color) => {
     const row = document.createElement("div");
     row.className = "palette-row";
-    row.style.cssText = "display:flex;gap:5px;margin-bottom:5px;";
 
-    // Filter CALL_* based on available subs
-    const availableKinds = KINDS.filter(k => {
-      if (!k.startsWith("CALL_")) return true;
-      const idx = parseInt(k.slice(-1)) - 1;
-      return (puzzle!.subs[idx] ?? 0) > 0;
-    });
-
-    availableKinds.forEach(kind => {
+    availableActions.forEach((action) => {
       const btn = document.createElement("button");
       btn.className = "palette-btn";
-      btn.innerText = ACTION_SYMBOLS[kind];
-      btn.style.cssText = `
-        width:32px;height:32px;border-radius:5px;border:none;cursor:pointer;
-        font-size:11px;font-family:'Share Tech Mono',monospace;color:white;font-weight:bold;
-        background:${COLOR_BG[filter]};
-        border:1px solid ${filter === Color.NOCOLOR ? "#444" : COLOR_ACCENT[filter]};
-        transition:transform 0.1s,opacity 0.1s;
-      `;
-      btn.addEventListener("mouseenter", () => { btn.style.transform = "scale(1.12)"; });
-      btn.addEventListener("mouseleave", () => { btn.style.transform = "scale(1)"; });
-      btn.addEventListener("click", e => {
+      btn.style.background = COLOR_BG[color];
+      btn.textContent = ACTION_SYMBOLS[action];
+      btn.title = `${action} / ${COLOR_LABEL[color]}`;
+      btn.addEventListener("click", (e) => {
         e.stopPropagation();
-        applyInstr(kind, filter);
+        applyInstruction(action as InstrDef["action"], color);
       });
       row.appendChild(btn);
     });
 
-    // Clear button
     const clear = document.createElement("button");
-    clear.className = "palette-btn palette-clear";
-    clear.innerText = "✕";
-    clear.style.cssText = `
-      width:32px;height:32px;border-radius:5px;cursor:pointer;
-      font-size:13px;font-family:'Share Tech Mono',monospace;
-      background:#2a2a2a;color:#888;border:1px solid #444;
-      transition:transform 0.1s;
-    `;
-    clear.addEventListener("mouseenter", () => { clear.style.transform = "scale(1.12)"; });
-    clear.addEventListener("mouseleave", () => { clear.style.transform = "scale(1)"; });
-    clear.addEventListener("click", e => {
+    clear.className = "palette-btn clear-btn";
+    clear.textContent = "✕";
+    clear.title = "Effacer";
+    clear.addEventListener("click", (e) => {
       e.stopPropagation();
-      applyInstr("VOID", Color.NOCOLOR);
+      applyInstruction("VOID", Color.NOCOLOR);
     });
     row.appendChild(clear);
-    pal.appendChild(row);
-    // Palette row created
+    pal!.appendChild(row);
   });
+
+  document.body.appendChild(pal);
 }
 
-function openPalette(btn: HTMLElement, fi: number, si: number): void {
-  selectedSlot = { fi, si, el: btn };
-  const pal = document.getElementById("palette")!;
-  const rect = btn.getBoundingClientRect();
+function openPalette(fi: number, ii: number, el: HTMLButtonElement): void {
+  selectedSlot = { fi, ii, el };
+  const pal = document.getElementById("palette-popup")!;
+  const rect = el.getBoundingClientRect();
+  pal.style.display = "flex";
+  pal.style.flexDirection = "column";
+  pal.style.position = "fixed";
+  pal.style.left = `${rect.left}px`;
+  pal.style.top  = `${rect.bottom + 4}px`;
+  pal.style.zIndex = "1000";
 
-  pal.style.display = "block";
-  pal.style.left = `${rect.left + window.scrollX}px`;
-  pal.style.top  = `${rect.bottom + window.scrollY + 6}px`;
-
-  // Close if clicking outside
   setTimeout(() => {
     document.addEventListener("click", closePaletteOutside);
   }, 0);
 }
 
 function closePaletteOutside(e: MouseEvent): void {
-  const pal = document.getElementById("palette");
-  if (pal && !pal.contains(e.target as Node)) {
-    closePalette();
-  }
+  const pal = document.getElementById("palette-popup");
+  if (pal && !pal.contains(e.target as Node)) closePalette();
 }
 
 function closePalette(): void {
-  const pal = document.getElementById("palette")!;
-  pal.style.display = "none";
+  const pal = document.getElementById("palette-popup");
+  if (pal) pal.style.display = "none";
   selectedSlot = null;
   document.removeEventListener("click", closePaletteOutside);
 }
 
-function applyInstr(kind: UiInstr["kind"], filter: FilterColor): void {
+function applyInstruction(action: InstrDef["action"], color: Color): void {
   if (!selectedSlot) return;
-  const { fi, si, el } = selectedSlot;
-  if (!uiProgram[fi]) return;
-  uiProgram[fi][si] = { kind, filter };
-  updateSlotDisplay(el, fi, si);
+  const { fi, ii } = selectedSlot;
+  const fKey = `F${fi + 1}` as keyof Program;
+  uiState.program[fKey][ii] = { action, color };
   closePalette();
-  // Rebuild execution state from start (programme a changé)
-  resetExecution();
+  renderFunctions();
 }
 
-// ─── Stack Rendering ────────────────────────────────────────────────────────
+// ─── Statut ────────────────────────────────────────────────────────────────────
 
-/**
- * The stack from gameState.ts is a recursive functional structure.
- * Cannot iterate easily without popping it.
- * Just display program slots with active cursor.
- */
-function renderStack(): void {
-  const container = document.getElementById("stack-display")!;
-  container.innerHTML = "";
-  if (!gameState) return;
-
-  // Display program functions with active instruction marking
-  // Simply display uiProgram and highlight next F1 instruction
-  // (simple approach since internal stack is opaque)
-
-  if (stackIsEmpty(gameState.stack)) {
-    container.innerText = "Stack vide";
-    return;
-  }
-
-  // Display call stack depth summary
-  const depth = gameState.stack.nb;
-  const info = document.createElement("div");
-  info.style.cssText = "font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a6480;margin-bottom:8px;";
-  info.innerText = `Depth: ${depth} nested call(s)`;
-  container.appendChild(info);
-
-  // Display each program function for reference
-  uiProgram.forEach((slots, fi) => {
-    if (!puzzle || puzzle.subs[fi] === 0) return;
-    const frame = document.createElement("div");
-    frame.style.cssText = `
-      background:#161923;border-radius:6px;padding:8px 10px;margin-bottom:8px;
-      border-left:3px solid #2a3040;
-    `;
-    const lbl = document.createElement("div");
-    lbl.style.cssText = "font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a6480;margin-bottom:6px;";
-    lbl.innerText = `F${fi + 1}`;
-    frame.appendChild(lbl);
-
-    const instrRow = document.createElement("div");
-    instrRow.style.cssText = "display:flex;gap:4px;flex-wrap:wrap;";
-    slots.forEach((instr, si) => {
-      const sp = document.createElement("span");
-      sp.style.cssText = `
-        width:28px;height:28px;border-radius:4px;display:inline-flex;
-        align-items:center;justify-content:center;
-        font-family:'Share Tech Mono',monospace;font-size:10px;color:white;
-        background:${COLOR_BG[instr.filter]};
-        ${instr.kind === "VOID" ? "opacity:0.3;" : ""}
-      `;
-      sp.innerText = ACTION_SYMBOLS[instr.kind] || "·";
-      instrRow.appendChild(sp);
-    });
-    frame.appendChild(instrRow);
-    container.appendChild(frame);
-  });
+function setStatus(msg: string, type: "info" | "ok" | "err" = "info"): void {
+  const el = document.getElementById("status-msg");
+  if (!el) return;
+  el.textContent = msg;
+  el.className = `status-${type}`;
 }
 
-// ─── Controls ────────────────────────────────────────────────────────────────
-
-function updateControls(): void {
-  const stepEl = document.getElementById("step-num")!;
-  stepEl.innerText = String(stepCount);
-
-  const statusEl = document.getElementById("status-msg")!;
-
-  if (!gameState) return;
-  // Update UI controls based on game state
-  if (robotIsFell(gameState.robot)) {
-    setStatus(statusEl, "HORS PLATEAU", "lost");
-    stopRun();
-  } else if (isWin(gameState.board)) {
-    setStatus(statusEl, "GAGNÉ 🎉", "won");
-    stopRun();
-  } else if (stackIsEmpty(gameState.stack)) {
-    setStatus(statusEl, "FIN DE PROGRAMME", "lost");
-    stopRun();
-  } else if (isOverStack(gameState.stack)) {
-    setStatus(statusEl, "STACK OVERFLOW", "lost");
-    stopRun();
-  } else {
-    setStatus(statusEl, "EN COURS", "play");
-  }
-}
-
-function setStatus(el: HTMLElement, text: string, kind: "won" | "lost" | "play"): void {
-  el.innerText = text;
-  el.className = `status-${kind}`;
-  el.style.cssText = {
-    won:  "background:rgba(6,214,160,0.15);color:#06d6a0;border:1px solid #06d6a0;padding:6px 14px;border-radius:20px;font-weight:600;font-size:13px;",
-    lost: "background:rgba(255,77,109,0.15);color:#ff4d6d;border:1px solid #ff4d6d;padding:6px 14px;border-radius:20px;font-weight:600;font-size:13px;",
-    play: "background:rgba(0,229,255,0.1);color:#00e5ff;border:1px solid #00e5ff;padding:6px 14px;border-radius:20px;font-weight:600;font-size:13px;",
-  }[kind];
-}
-
-function isGameOver(): boolean {
-  if (!gameState) return true;
-  return robotIsFell(gameState.robot) ||
-         isWin(gameState.board) ||
-         stackIsEmpty(gameState.stack) ||
-         isOverStack(gameState.stack);
-}
-
-function doStep(): void {
-  if (!gameState || isGameOver()) return;
-
-  // Save snapshot for undo
-  history.push({ state: gameState, step: stepCount });
-  if (history.length > 500) history.shift(); // limit memory
-
-  try {
-    gameState = popStateStack(gameState);
-    stepCount++;
-    renderAll();
-  } catch (e) {
-    stopRun();
-    alert("Erreur: " + (e as Error).message);
-  }
-}
-
-function doBack(): void {
-  const snap = history.pop();
-  if (!snap) return;
-  gameState = snap.state;
-  stepCount = snap.step;
-  renderAll();
-}
+// ─── Actions boutons ────────────────────────────────────────────────────────────
 
 function doReset(): void {
-  resetExecution();
+  if (autoInterval !== null) { clearInterval(autoInterval); autoInterval = null; }
+  uiState.gameState = null;
+  uiState.history = [];
+  uiState.status = "idle";
+  uiState.steps = 0;
+  setStatus("Programme réinitialisé.");
+  renderBoard(uiState.puzzle, null);
+  renderFunctions();
+  updateRunBtn(false);
 }
 
-function stopRun(): void {
-  if (runTimer !== null) {
-    clearInterval(runTimer);
-    runTimer = null;
+function doStepForward(): void {
+  if (uiState.status === "won" || uiState.status === "lost") return;
+
+  if (!uiState.gameState) {
+    uiState.history = [];
+    uiState.gameState = buildInitialState(uiState.puzzle, uiState.program);
+    uiState.status = "running";
   }
-  const btn = document.getElementById("btn-run")!;
-  btn.innerText = "▶";
-  btn.title = "Play";
+
+  uiState.history.push(uiState.gameState);
+  const result = stepOnce(uiState.gameState);
+
+  if (result.kind === "ok") {
+    uiState.gameState = result.state;
+    uiState.steps++;
+    setStatus(`Étape ${uiState.steps}`);
+    renderBoard(uiState.puzzle, uiState.gameState);
+  } else if (result.kind === "won") {
+    uiState.status = "won";
+    setStatus(`🎉 Puzzle résolu en ${uiState.steps} étapes !`, "ok");
+    renderBoard(uiState.puzzle, uiState.history[uiState.history.length - 1]);
+  } else {
+    uiState.status = "lost";
+    setStatus(`❌ ${result.reason}`, "err");
+  }
 }
 
-function startRun(): void {
-  const btn = document.getElementById("btn-run")!;
-  btn.innerText = "⏸";
-  btn.title = "Pause";
+function doStepBack(): void {
+  if (uiState.history.length === 0) { setStatus("Pas d'historique."); return; }
+  if (autoInterval !== null) { clearInterval(autoInterval); autoInterval = null; updateRunBtn(false); }
+  uiState.gameState = uiState.history.pop()!;
+  uiState.status = "running";
+  uiState.steps = Math.max(0, uiState.steps - 1);
+  setStatus(`← Retour — étape ${uiState.steps}`);
+  renderBoard(uiState.puzzle, uiState.gameState);
+}
 
-  runTimer = window.setInterval(() => {
-    if (isGameOver()) {
-      stopRun();
-      return;
+let autoInterval: number | null = null;
+
+function updateRunBtn(running: boolean): void {
+  const btn = document.getElementById("btn-run") as HTMLButtonElement | null;
+  if (!btn) return;
+  btn.textContent = running ? "⏸" : "▶";
+  btn.title = running ? "Pause" : "Lancer";
+}
+
+function doRunAll(): void {
+  if (autoInterval !== null) {
+    clearInterval(autoInterval); autoInterval = null;
+    setStatus("⏸ Pause");
+    updateRunBtn(false);
+    return;
+  }
+  if (uiState.status === "won" || uiState.status === "lost") doReset();
+
+  setStatus("▶ Exécution…");
+  updateRunBtn(true);
+  autoInterval = window.setInterval(() => {
+    doStepForward();
+    if (uiState.status === "won" || uiState.status === "lost") {
+      clearInterval(autoInterval!); autoInterval = null;
+      updateRunBtn(false);
     }
-    doStep();
-  }, 120);
+  }, 180);
 }
 
-// ─── Bootstrap ────────────────────────────────────────────────────────────────
+// ─── Chargement des puzzles ─────────────────────────────────────────────────────
 
-window.addEventListener("load", async () => {
-  puzzles = await fetchPuzzles();
+async function fetchPuzzles(): Promise<Puzzle[]> {
+  const res = await fetch("/share/puzzles.json");
+  return res.json();
+}
 
-  // Load first puzzle by default
+function emptyProgram(puzzle: Puzzle): Program {
+  const empty = () => ({ action: "VOID" as const, color: Color.NOCOLOR });
+  return {
+    F1: Array.from({ length: puzzle.subs[0] }, empty),
+    F2: Array.from({ length: puzzle.subs[1] }, empty),
+    F3: Array.from({ length: puzzle.subs[2] }, empty),
+    F4: Array.from({ length: puzzle.subs[3] }, empty),
+    F5: Array.from({ length: puzzle.subs[4] }, empty),
+  };
+}
+
+function loadPuzzle(puzzle: Puzzle): void {
+  if (autoInterval !== null) { clearInterval(autoInterval); autoInterval = null; }
+  uiState = {
+    puzzle,
+    program: emptyProgram(puzzle),
+    gameState: null,
+    history: [],
+    status: "idle",
+    steps: 0,
+  };
+
+  const titleEl = document.getElementById("puzzle-title");
+  const aboutEl = document.getElementById("puzzle-about");
+  if (titleEl) titleEl.textContent = `#${puzzle.id} — ${puzzle.title}`;
+  if (aboutEl) aboutEl.textContent = puzzle.about || "";
+
+  buildPalettePopup();
+  renderBoard(puzzle, null);
+  renderFunctions();
+  setStatus("Remplis les fonctions puis appuie sur ▶.");
+  updateRunBtn(false);
+}
+
+// ─── Point d'entrée ─────────────────────────────────────────────────────────────
+
+window.onload = async () => {
+  const puzzles = await fetchPuzzles();
+
+  const select = document.getElementById("puzzle-select") as HTMLSelectElement;
+  puzzles.forEach((p, i) => {
+    const opt = document.createElement("option");
+    opt.value = String(i);
+    opt.textContent = `#${p.id} — ${p.title}`;
+    select.appendChild(opt);
+  });
+
+  select.addEventListener("change", () => {
+    const idx = parseInt(select.value);
+    if (!isNaN(idx)) loadPuzzle(puzzles[idx]);
+  });
+
+  document.getElementById("btn-run")      ?.addEventListener("click", doRunAll);
+  document.getElementById("btn-step-fwd") ?.addEventListener("click", doStepForward);
+  document.getElementById("btn-step-bwd") ?.addEventListener("click", doStepBack);
+  document.getElementById("btn-reset")    ?.addEventListener("click", doReset);
+
   if (puzzles.length > 0) {
-    loadPuzzleById(puzzles[0].id);
+    select.value = "0";
+    loadPuzzle(puzzles[0]);
   }
-
-  // Load button handler
-  document.getElementById("load-btn")!.addEventListener("click", () => {
-    const idStr = (document.getElementById("puzzle-id-input") as HTMLInputElement).value;
-    const id = parseInt(idStr, 10);
-    if (!isNaN(id)) loadPuzzleById(id);
-  });
-
-  // Enter key in input field
-  (document.getElementById("puzzle-id-input") as HTMLInputElement).addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-      document.getElementById("load-btn")!.click();
-    }
-  });
-
-  // Step forward button
-  document.getElementById("btn-step")!.addEventListener("click", () => {
-    stopRun();
-    doStep();
-  });
-
-  // Step back button
-  document.getElementById("btn-back")!.addEventListener("click", () => {
-    stopRun();
-    doBack();
-  });
-
-  // Run / Pause button
-  document.getElementById("btn-run")!.addEventListener("click", () => {
-    if (runTimer !== null) {
-      stopRun();
-    } else {
-      if (isGameOver()) doReset();
-      startRun();
-    }
-  });
-
-  // Reset button
-  document.getElementById("btn-reset")!.addEventListener("click", () => {
-    doReset();
-  });
-});
+};

@@ -1,437 +1,350 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Robot Puzzle</title>
+  <title>Robot Visualizer</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;600;800&display=swap');
-
-    :root {
-      --bg:        #0d0f14;
-      --surface:   #161923;
-      --panel:     #1e2330;
-      --border:    #2a3040;
-      --accent:    #00e5ff;
-      --accent2:   #ff4d6d;
-      --gold:      #ffd166;
-      --green:     #06d6a0;
-      --text:      #e0e6f0;
-      --muted:     #5a6480;
-      --red-tile:  #6b1a2a;
-      --green-tile:#0d4a32;
-      --blue-tile: #0d2a6b;
-      --red-star:  #ff4d6d;
-      --green-star:#06d6a0;
-      --blue-star: #00e5ff;
+    @font-face {
+      font-family: 'robots';
+      src: url('./projRobotFont.ttf') format('truetype');
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #1a1a24;
+      --surface:   #22222f;
+      --surface2:  #2a2a3a;
+      --border:    #3a3a50;
+      --text:      #e8e8f0;
+      --muted:     #7a7a95;
+      --red:       #992222;
+      --red-light: #cc3333;
+      --green:     #1e7a1e;
+      --green-light:#28a428;
+      --blue:      #1545a8;
+      --blue-light:#2060d0;
+      --accent:    #7060e0;
+      --accent2:   #a090ff;
+      --ok:        #2e7d32;
+      --err:       #8b1a1a;
+    }
 
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'Exo 2', sans-serif;
+      font-family: 'Courier New', monospace;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 24px 16px;
+      gap: 20px;
     }
 
-    /* ── Header ─────────────────────────────────── */
+    /* ── Header ── */
     header {
       width: 100%;
-      padding: 18px 32px;
+      max-width: 960px;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 16px;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-    }
-    header h1 {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      color: var(--accent);
-      text-transform: uppercase;
-    }
-    header span.sub {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 12px;
-      color: var(--muted);
+      flex-wrap: wrap;
     }
 
-    /* ── Puzzle Selector ─────────────────────────── */
-    #selector-bar {
-      width: 100%;
-      max-width: 1100px;
-      padding: 16px 0;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    #selector-bar label {
-      font-size: 12px;
-      color: var(--muted);
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 3px;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      white-space: nowrap;
+      color: var(--accent2);
     }
-    #puzzle-id-input {
-      width: 80px;
-      padding: 8px 12px;
-      background: var(--panel);
+
+    #puzzle-select {
+      background: var(--surface2);
+      color: var(--text);
       border: 1px solid var(--border);
       border-radius: 6px;
-      color: var(--text);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 14px;
-    }
-    #puzzle-id-input:focus { outline: none; border-color: var(--accent); }
-
-    #load-btn {
-      padding: 8px 20px;
-      background: transparent;
-      border: 1px solid var(--accent);
-      border-radius: 6px;
-      color: var(--accent);
-      font-family: 'Exo 2', sans-serif;
-      font-weight: 600;
+      padding: 6px 10px;
+      font-family: inherit;
       font-size: 13px;
       cursor: pointer;
-      letter-spacing: 1px;
-      transition: background 0.2s, color 0.2s;
+      min-width: 220px;
     }
-    #load-btn:hover { background: var(--accent); color: var(--bg); }
+    #puzzle-select:focus { outline: 2px solid var(--accent); }
 
+    /* ── Puzzle info ── */
     #puzzle-info {
-      flex: 1;
-      text-align: right;
+      width: 100%;
+      max-width: 960px;
+      border-left: 3px solid var(--accent);
+      padding-left: 12px;
     }
-    #puzzle-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--gold);
-    }
-    #puzzle-about {
-      font-size: 12px;
-      color: var(--muted);
-      font-style: italic;
-      margin-top: 2px;
-    }
+    #puzzle-title { font-size: 16px; font-weight: 700; color: var(--accent2); }
+    #puzzle-about { font-size: 12px; color: var(--muted); margin-top: 3px; }
 
-    /* ── Main Layout ──────────────────────────────── */
+    /* ── Main layout ── */
     #main {
       width: 100%;
-      max-width: 1100px;
+      max-width: 960px;
       display: flex;
-      gap: 24px;
-      padding-bottom: 32px;
+      gap: 20px;
+      align-items: flex-start;
+      flex-wrap: wrap;
     }
 
-    /* ── Board ────────────────────────────────────── */
+    /* ── Board ── */
     #board-wrap {
-      flex-shrink: 0;
+      flex: 0 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
     }
 
-    #board-container {
-      position: relative;
-      display: inline-block;
-    }
-
-    #visualizer_board {
+    #board-wrap table {
       border-collapse: collapse;
-      display: block;
     }
 
-    #visualizer_board td {
-      width: 36px;
-      height: 36px;
+    #board-wrap td {
+      width: 28px;
+      height: 28px;
       text-align: center;
-      padding: 0;
-      font-size: 18px;
-      border: 1px solid rgba(255,255,255,0.04);
+      vertical-align: middle;
+      font-size: 13px;
+      border: 1px solid #12121a;
+    }
+
+    td.empty-cell  { background: #111118; }
+    td.red         { background: var(--red); }
+    td.green       { background: var(--green); }
+    td.blue        { background: var(--blue); }
+    td.star-cell   { color: #ffe066; font-size: 11px; }
+    td.robot-cell  {
+      color: #fff;
+      font-size: 14px;
+      font-weight: bold;
+      outline: 2px solid #fff;
+      outline-offset: -2px;
+      z-index: 1;
       position: relative;
     }
+    td.red.robot-cell    { background: var(--red-light); }
+    td.green.robot-cell  { background: var(--green-light); }
+    td.blue.robot-cell   { background: var(--blue-light); }
 
-    .void-tile  { background: #0a0c10; }
-    .red-tile   { background: var(--red-tile); }
-    .green-tile { background: var(--green-tile); }
-    .blue-tile  { background: var(--blue-tile); }
-
-    .star-marker {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      pointer-events: none;
-    }
-
-    .robot-cell {
-      font-size: 20px;
-      filter: drop-shadow(0 0 6px var(--accent));
-    }
-
-    /* ── Right panel ─────────────────────────────── */
+    /* ── Right panel ── */
     #right-panel {
-      flex: 1;
+      flex: 1 1 260px;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      min-width: 0;
     }
 
-    /* ── Functions editor ────────────────────────── */
-    #functions-panel {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 16px;
+    /* ── Controls ── */
+    #controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
     }
-    #functions-panel h3 {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
+
+    #controls button {
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface2);
+      color: var(--text);
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, transform 0.1s;
+    }
+    #controls button:hover  { background: var(--border); }
+    #controls button:active { transform: scale(0.93); }
+
+    #btn-run   { color: #7aff7a; }
+    #btn-step-fwd { color: #a090ff; }
+    #btn-step-bwd { color: #f0a060; }
+    #btn-reset { color: #ff6b6b; }
+
+    /* ── Status ── */
+    #status-msg {
+      font-size: 13px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
       color: var(--muted);
-      margin-bottom: 14px;
+      min-height: 36px;
+    }
+    #status-msg.status-ok  { background: #1a3a1a; border-color: #2e6b2e; color: #7aff7a; }
+    #status-msg.status-err { background: #3a1a1a; border-color: #8b2e2e; color: #ff7a7a; }
+    #status-msg.status-info{ color: var(--text); }
+
+    /* ── Functions ── */
+    #functions-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    #functions-panel h2 {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    #functions-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
     .func-row {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
+      gap: 6px;
     }
+
     .func-label {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 13px;
-      color: var(--accent);
       width: 28px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent2);
       flex-shrink: 0;
     }
-    .func-slots {
-      display: flex;
-      gap: 5px;
-      flex-wrap: wrap;
-    }
-    .slot {
+
+    .slot-btn {
       width: 36px;
       height: 36px;
       border: 1px solid var(--border);
       border-radius: 5px;
-      background: var(--surface);
-      color: var(--text);
+      background: #252530;
+      color: #fff;
       font-size: 13px;
+      font-weight: bold;
       cursor: pointer;
+      transition: filter 0.1s, transform 0.1s, border-color 0.1s;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: border-color 0.15s, background 0.15s;
-      position: relative;
-      font-family: 'Share Tech Mono', monospace;
+      padding: 0;
     }
-    .slot:hover { border-color: var(--accent); background: #222b3a; }
-    .slot.active-instr {
-      border-color: var(--gold);
-      box-shadow: 0 0 8px var(--gold);
+    .slot-btn:hover       { filter: brightness(1.3); border-color: var(--accent); }
+    .slot-btn:active      { transform: scale(0.92); }
+    .slot-btn.selected    { border: 2px solid var(--accent2); }
+
+    /* ── Legend ── */
+    #legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
     }
 
-    /* color filter dot on slot */
-    .slot .color-dot {
-      position: absolute;
-      bottom: 3px;
-      right: 3px;
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-    }
-
-    /* ── Palette popup ──────────────────────────── */
-    #palette {
-      display: none;
-      position: fixed;
-      z-index: 999;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px;
+    /* ── Palette popup ── */
+    #palette-popup {
+      background: #1e1e2e;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 8px;
+      gap: 4px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.7);
     }
+
     .palette-row {
       display: flex;
-      gap: 5px;
-      margin-bottom: 5px;
+      gap: 4px;
+      align-items: center;
     }
+
     .palette-btn {
       width: 34px;
       height: 34px;
-      border-radius: 5px;
-      border: none;
-      cursor: pointer;
-      font-size: 12px;
-      font-family: 'Share Tech Mono', monospace;
-      color: white;
-      font-weight: bold;
-      transition: transform 0.1s, opacity 0.1s;
-    }
-    .palette-btn:hover { transform: scale(1.12); }
-    .palette-clear {
-      background: #2a2a2a !important;
-      color: #888 !important;
-      border: 1px solid #444 !important;
-    }
-
-    /* ── Controls ────────────────────────────────── */
-    #controls {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .ctrl-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text);
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s, border-color 0.2s, transform 0.1s;
-    }
-    .ctrl-btn:hover { border-color: var(--accent); background: #1a2233; }
-    .ctrl-btn:active { transform: scale(0.92); }
-    #btn-run   { color: var(--green); }
-    #btn-step  { color: var(--accent); }
-    #btn-back  { color: var(--gold); }
-    #btn-reset { color: var(--accent2); }
-
-    #step-counter {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 13px;
-      color: var(--muted);
-      margin-left: auto;
-    }
-    #step-counter span { color: var(--text); }
-
-    #status-msg {
-      font-size: 13px;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-weight: 600;
-    }
-    .status-won   { background: rgba(6,214,160,0.15); color: var(--green); border: 1px solid var(--green); }
-    .status-lost  { background: rgba(255,77,109,0.15); color: var(--accent2); border: 1px solid var(--accent2); }
-    .status-play  { background: rgba(0,229,255,0.1);  color: var(--accent);  border: 1px solid var(--accent); }
-
-    /* ── Stack display ───────────────────────────── */
-    #stack-panel {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 16px;
-      flex: 1;
-      overflow-y: auto;
-      max-height: 320px;
-    }
-    #stack-panel h3 {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: var(--muted);
-      margin-bottom: 12px;
-    }
-    .stack-frame {
-      background: var(--surface);
-      border-radius: 6px;
-      padding: 8px 10px;
-      margin-bottom: 8px;
-      border-left: 3px solid var(--border);
-    }
-    .stack-frame.active { border-left-color: var(--gold); }
-    .stack-frame-label {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    .stack-frame-instrs {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-    }
-    .stack-instr {
-      width: 28px;
-      height: 28px;
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px;
-      color: white;
+      color: #fff;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: filter 0.1s, transform 0.1s;
+      padding: 0;
     }
-    .stack-instr.cursor { outline: 2px solid var(--gold); }
+    .palette-btn:hover  { filter: brightness(1.4); }
+    .palette-btn:active { transform: scale(0.9); }
+    .clear-btn {
+      background: #2a2a3a !important;
+      border-color: #555 !important;
+      color: #aaa;
+    }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>⬡ Robot Puzzle</h1>
-  <span class="sub">Functional stack machine</span>
-</header>
+  <header>
+    <h1>🤖 Robot</h1>
+    <select id="puzzle-select">
+      <option value="">— Choisir un puzzle —</option>
+    </select>
+  </header>
 
-<div id="selector-bar">
-  <label>Puzzle ID</label>
-  <input id="puzzle-id-input" type="number" value="0" min="0" />
-  <button id="load-btn">Load</button>
   <div id="puzzle-info">
     <div id="puzzle-title">—</div>
     <div id="puzzle-about"></div>
   </div>
-</div>
 
-<div id="main">
-  <div id="board-wrap">
-    <div id="board-container">
-      <table><tbody id="visualizer_board"></tbody></table>
+  <div id="main">
+
+    <div id="board-wrap">
+      <table><tbody id="game-board"></tbody></table>
+    </div>
+
+    <div id="right-panel">
+
+      <div id="controls">
+        <button id="btn-run"      title="Lancer / Pause">▶</button>
+        <button id="btn-step-fwd" title="Avancer d'une étape">➔</button>
+        <button id="btn-step-bwd" title="Reculer d'une étape">←</button>
+        <button id="btn-reset"    title="Réinitialiser">↺</button>
+      </div>
+
+      <div id="status-msg">Choisis un puzzle pour commencer.</div>
+
+      <div id="functions-panel">
+        <h2>Fonctions</h2>
+        <div id="functions-container"></div>
+      </div>
+
+      <div id="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Rouge</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Vert</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div> Bleu</div>
+        <div class="legend-item">★ étoile à ramasser</div>
+        <div class="legend-item">↑↓←→ robot</div>
+      </div>
+
     </div>
   </div>
 
-  <div id="right-panel">
-    <div id="functions-panel">
-      <h3>Programme</h3>
-      <div id="func-rows"></div>
-    </div>
-
-    <div id="controls">
-      <button class="ctrl-btn" id="btn-back"  title="Step back">⬅</button>
-      <button class="ctrl-btn" id="btn-step"  title="Step forward">➔</button>
-      <button class="ctrl-btn" id="btn-run"   title="Play / Pause">▶</button>
-      <button class="ctrl-btn" id="btn-reset" title="Reset">↺</button>
-      <div id="step-counter">Step <span id="step-num">0</span></div>
-      <div id="status-msg" class="status-play">READY</div>
-    </div>
-
-    <div id="stack-panel">
-      <h3>Call Stack</h3>
-      <div id="stack-display"></div>
-    </div>
-  </div>
-</div>
-
-<!-- Palette popup -->
-<div id="palette"></div>
-
-<script type="module" src="./funcs.ts"></script>
+  <script type="module" src="./funcs.ts"></script>
 </body>
 </html>
