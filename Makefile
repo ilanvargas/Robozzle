@@ -10,6 +10,10 @@ test:
 	@echo "--- Exécution test jester ---"
 	npx jest --coverage -c jest.config.ts
 
+setup:
+	mkdir -p public
+	cp share/puzzles.json public/puzzles.json
+
 eslint:
 	npx eslint --fix src/ test/
 
