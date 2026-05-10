@@ -57,7 +57,7 @@ function actionGame(aFunGame: (g: Game) => Game, cond?: (g: Robot) => boolean): 
 // RETURN: an action
 function actionFunct(aFunctTrunk: () => Funct, cond?: (g: Robot) => boolean): Action {
   return (aState: State) => {
-    const aFunct = aFunctTrunk();
+    const aFunct = aFunctTrunk().slice().reverse();
     if (cond === undefined || cond(aState.robot)) {
       // function call
       const stackCall =
@@ -96,14 +96,21 @@ function popStateStack(aState: State): State {
 // Verify if the funct list is according to puzzle specifications
 // ARG: puzzle and function list
 // returns nothing but can raise errors
-function verifyArrayFunc(aPuzzle: Puzzle, aArrayFunct: Array<Funct>): void {
+
+function verifyArrayFunc(aPuzzle: Puzzle | undefined, aArrayFunct: Array<Funct>): void {
+  if (aPuzzle === undefined)
+    throw new Error("Puzzle not found");
+
   if (aArrayFunct.length !== 5)
-    throw new Error('List of functions needs to be length 5');
-  else 
-    aPuzzle.subs.forEach((e: number, i: number) => {
-      if (aArrayFunct[i].length > e) 
-        throw new Error(`Function {i} is too big: {aArray[i]} size when supposed to be <{e}`);
-    });
+    throw new Error("List of functions needs to be length 5");
+
+  aPuzzle.subs.forEach((e: number, i: number) => {
+    if (aArrayFunct[i].length > e) {
+      throw new Error(
+        `Function ${i} is too big: ${aArrayFunct[i].length} when supposed to be <= ${e}`
+      );
+    }
+  });
 }
 
 export { Action, State, Funct, popStateStack, actionGame, actionFunct, verifyArrayFunc };
