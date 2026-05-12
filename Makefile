@@ -5,9 +5,6 @@ all: build
 build:
 	npx tsc -p tsconfig.json
 
-test_robot: build
-	npx tsx dist/test/robot_test.js
-
 test: 
 	npx jest --coverage -c jest.config.ts
 
@@ -22,7 +19,7 @@ serve:
 	npx parcel serve src/index.html
 
 run: 
-	npx tsx dist/test/main_test.js
+	npx tsx dist/test/robot_test.js
 
 clean:
 	rm -rf dist/*
