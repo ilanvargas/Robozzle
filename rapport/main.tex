@@ -1,0 +1,108 @@
+\documentclass{article}
+
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{listings}
+
+%%%%%%%%%%%%%%%% Lengths %%%%%%%%%%%%%%%%
+\setlength{\textwidth}{17cm}
+\setlength{\evensidemargin}{0cm}
+\setlength{\oddsidemargin}{0cm}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+
+    \includegraphics[width=0.25\textwidth]{logo.jpg}\par\vspace{1cm}
+
+    {\scshape\LARGE Bordeaux INP \par}
+    \vspace{0.5cm}
+    {\scshape\Large ENSEIRB-MATMECA \par}
+
+    \vspace{2.5cm}
+
+    {\huge\bfseries Projet Robozzle \par}
+
+    \vspace{1cm}
+
+    {\Large Projet de programmation fonctionnelle : développement d’un jeu de programmation de robots \par}
+
+    \vspace{3cm}
+
+    \begin{flushleft}
+        \large
+        \textbf{Auteur :} VARGAS Ilan, HSSASSA Mohsine, DASSOULI Youssef\\[0.3cm]
+        \textbf{Formation :} Informatique\\[0.3cm]
+        \textbf{Année universitaire :} 2025--2026\\[0.3cm]
+        \textbf{Encadrant :} LOMBARDY Sylvain
+    \end{flushleft}
+
+    \vfill
+
+    {\large \today \par}
+
+\end{titlepage}
+
+\section*{Introduction}
+
+Ce projet s'inscrit dans le cadre de l'unité d'enseignement de programmation fonctionnelle de sixième semestre. Il nous a été proposé de concevoir et d'implémenter un programme TypeScript permettant de faire jouer des parties, de décrire des programmes pilotant un robot, et d'en évaluer l'exécution, en prenant comme base le jeu Robozzle.
+
+Robozzle est un puzzle de programmation dans lequel le joueur doit guider un robot sur un plateau de cases colorées afin de collecter des étoiles, en écrivant un programme composé de fonctions récursives et d'instructions conditionnelles. La contrainte centrale du jeu est son minimalisme : pas de variables, pas de boucles explicites, uniquement de la récursivité.
+
+Ce cadre soulève une question de conception fondamentale : comment représenter un système dynamique, comme un robot évoluant dans un monde, en respectant les principes de la programmation fonctionnelle, c'est-à-dire sans état mutable et par composition de types abstraits ?
+
+C'est autour de cette problématique que s'organise ce rapport, en suivant la hiérarchie de modules construite au cours du développement : des types fondateurs jusqu'à l'évaluateur et l'interface interactive.
+
+\tableofcontents
+
+\section{Architecture}
+
+\input{architecture.tex}
+
+\section{Les types de base}
+
+\input{puzzle.tex}
+
+\section{Type abstrait Board}
+
+\input{board.tex}
+
+\section{Robot et actions sur Game}
+
+\input{robot.tex}
+
+\section{Tests et validité}
+
+\input{test.tex}
+
+\section{Module GameState}
+
+\input{state.tex}
+
+\section{Le langage et l'évaluateur}
+
+\input{code.tex}
+
+\section{Main et interface graphique}
+
+\input{UI.tex}
+
+\section*{Conclusion}
+
+Ce projet nous a permis de mettre en pratique les principes fondamentaux de la programmation fonctionnelle dans un contexte concret et complet : de la définition des types de base jusqu'à l'interface interactive, en passant par l'évaluateur.
+
+Le fil directeur de l'ensemble du développement est la composition de types abstraits. Plutôt que de construire un système monolithique, nous avons décomposé le problème en modules autonomes, chacun définissant un TAD à partir des couches inférieures. Cette approche a naturellement produit un code modulaire, testable isolément, et robuste aux changements d'implémentation. L'immuabilité, appliquée systématiquement, a simplifié le raisonnement sur le comportement du programme et rendu possible des fonctionnalités comme le retour en arrière sans complexité supplémentaire.
+
+Ce projet illustre ainsi comment les paradigmes de la programmation fonctionnelle tels que l’abstraction, la composition, l’immuabilité, ne sont pas de simples contraintes théoriques, mais des outils concrets qui guident la conception vers des architectures plus claires et plus maintenables.
+
+Parmi les fonctionnalités proposées par le sujet que nous n'avons pas implémentées figurent la génération automatique de puzzles et la recherche de solutions, qui constituent des prolongements naturels s'appuyant directement sur l'évaluateur existant.
+
+\end{document}

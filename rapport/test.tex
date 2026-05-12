@@ -1,0 +1,29 @@
+Les tests ont été écrits avec Jest et couvrent les trois modules fondateurs : \textit{stack.ts}, \textit{square.ts} et \textit{board.ts}. Ils constituent un outil de vérification du comportement attendu de chaque TAD, mais aussi un filet de sécurité contre les régressions lors des modifications du code.
+\\
+
+Chaque suite de tests est organisée par opération. Pour chaque fonction exposée, on teste le cas nominal, les cas limites, et les invariants importants. Par exemple :
+\begin{itemize}
+  \item vérifier qu’une pile vide est uniquement représentée par \texttt{nil} ;
+  \item garantir que \texttt{cons} ne modifie pas l’attribut \texttt{nb} ;
+  \item tester les déplacements hors du plateau ;
+  \item vérifier la suppression correcte d’une étoile et la mise à jour cohérente de \texttt{nbStars} ;
+  \item valider la détection des dépassements de pile avec \texttt{isOverStack}.
+\end{itemize}
+
+Une attention particulière a été portée aux propriétés d’immuabilité. Plusieurs tests vérifient explicitement que les anciennes structures restent inchangées après création d’une nouvelle version, ce qui est essentiel dans notre architecture fonctionnelle.
+\\
+
+L’utilisation de Jest et de son outil de couverture a permis d’évaluer quantitativement les tests réalisés. Les résultats obtenus montrent une couverture de :
+\begin{itemize}
+\item 97.43\% des instructions ;
+\item 85.71\% des branches ;
+\item 100\% des fonctions ;
+\item 96.96\% des lignes.
+\end{itemize}
+
+Les 31 tests passent, avec une couverture globale de 97,43\% des instructions et 100\% des fonctions jusqu’à présent. Les deux lignes non couvertes dans board.ts (lignes 41 et 84) correspondent au cas default des switch sur les directions et les couleurs, des branches défensivement écrites mais inatteignables avec les types actuels.
+
+La couverture de branches s'établit à 85,71\%, écart principalement dû à ces mêmes cas default. 
+\\
+
+Chaque type abstrait de données possède sa propre suite de tests dédiée. Cette séparation suit directement l’architecture modulaire du projet : chaque couche est validée indépendamment avant d’être utilisée par les couches supérieures. Ainsi, les tests de \textit{stack.ts} garantissent les propriétés fondamentales de la pile immuable, sur lesquelles reposent ensuite les modules \textit{gameState.ts} et \textit{main.ts}.

@@ -1,0 +1,24 @@
+Le module \textit{robot.ts} définit le type abstrait \textit{Robot} et l'encapsulation \textit{Game} qui permet de faire des actions sur un robot.
+
+\subsection{Définition de Robot}
+
+Le type \textit{Robot} est définie par une position \texttt{.square} représenté par un \textit{Square}, dont nous avons déjà établit que cela représente une position, et une \texttt{.dir} direction \textit{Dir}.
+
+On notera également l'utilisation de \texttt{generalSquare}, une fonction d'ordre supérieur générique qui factorise l'accès aux attributs du Square sous-jacent au robot.
+
+\subsection{Encapsulateur Game et actions game}
+
+Nous encapsulons un robot et un board dans un type \textit{Game}. Nous pouvons faire des actions sur \textit{Game}, c’est-à-dire des fonctions qui prennent un game et retournent un autre.
+
+ Nous définissons ainsi \textbf{turnRight, turnLeft} qui tournent robot de game, c’est-à-dire modifie la direction du robot horaire ou antihoraire, et \textbf{moveForward} qui fait avancer le robot dans le board, donc change .square en créant un nouveau robot qui sera retourné par la fonction.
+
+Board doit être inclus en argument et retourné car l’action peut le changer, par exemple \texttt{gameNew = moveForward(game)} peut avoir le robot sur un square étoile ce qui signifie qu’il faut créer un nouveau bord sans cette étoile. Si board n'est pas modifier alors on retourne lui même.
+
+C’est la responsabilité de l’action de vérifier ces cas (\texttt{square.isStar === 1} pour l'exemple précédent) mais c’est à \textit{board.ts} de manipuler le board (move2square pour bouger robot, removeStar pour un nouveau board sans l’étoile). 
+
+
+\subsection{Observations sur l’abstraction et découplage}
+
+C'est ici que l'on peut constater le bénéfice de notre architecture. \textit{Square} aurait pu être une simple paire de coordonnées (x, y) dans une matrice dans \textit{Board}, un pointeur vers un élément du tableau dans \textit{Board} ou encore un sommet de graphe représenté par \textit{Board} comme envisagé initialement. Du moment que \textit{Square} expose les attributs \texttt{isStar} et \texttt{color} ainsi que ses méthodes, le module de \textit{robot.ts} fonctionne. L'abstraction introduite par \textit{square.ts} découple \textit{robot.ts} de toute décision d'implémentation prise dans \textit{board.ts} et \textit{square.ts}.
+
+Nous continuerons dans cette logique en construisant chaque nouveau type abstrait à partir des précédents. Chaque couche enrichit la précédente en ajoutant un niveau d'abstraction supplémentaire, sans jamais en exposer les détails internes. Cette composition ascendante de TADs est le principe structurant de l'ensemble du projet.

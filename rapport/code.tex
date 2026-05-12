@@ -1,0 +1,81 @@
+La prochaine étape naturelle consiste à concevoir un langage simplifié permettant de décrire des programmes pilotant un robot. 
+
+\subsection{Conception du langage}
+
+Robozzle repose sur un modèle de programmation par fonctions : un programme est un ensemble de fonctions numérotées, chacune étant une séquence d'instructions élémentaires. 
+
+Les instructions disponibles sont les mouvements du robot, les rotations, et les appels de fonctions. Chaque instruction peut être conditionnée par la couleur de la case sur laquelle se trouve le robot. C’est un modèle minimaliste sans variables ni boucles explicites, le seul mécanisme de répétition est la récursivité. C'est à partir de cette spécification que nous avons élaboré notre langage en TypeScript.
+
+Dans notre implémentation, ce langage repose sur deux concepts fondamentaux : les \textit{Action} et les \textit{Funct}.
+
+Une \textit{Action} constitue l’instruction élémentaire du langage. Elle se décline sous deux formes :
+\begin{itemize}
+    \item les \textit{actionGame}, qui correspondent aux actions exécutées sur le robot (\textit{moveForward}, \textit{turnLeft}, \textit{turnRight}) ;
+    \item les \textit{actionCall}, qui permettent l’appel d’une fonction.
+\end{itemize}
+
+Ces actions peuvent être associées à une condition optionnelle par rapport à l’état du robot ou la couleur de la case courante. 
+
+Une \textit{Funct} est alors définie comme une séquence ordonnée d’actions. Un programme complet est composé de cinq fonctions, chacune contenant un nombre fini d’actions selon les contraintes du puzzle courant. Certaines fonctions peuvent, ou même doivent, être vides. L'ensemble des cinq \textit{Funct} constitue le programme complet, rassemblé le tableau \texttt{arrayFunct}. C'est l'unique point d'entrée mis à disposition du joueur pour écrire son programme.
+
+Finalement le joueur peut décider l’id du puzzle en modifiant \texttt{puzzle\_id}. Tout cela se trouve dans le fichier \textit{code.ts}, le seul fichier que le client à le droit de modifier.
+
+\subsection{Évaluateur}
+
+L'évaluateur est le mécanisme qui, étant donné un programme et un monde initial, réalise l'exécution pas à pas et produit un résultat. Il repose sur trois fonctions fondamentales.
+
+\subsubsection{Initialisation}
+
+La fonction \texttt{initState} construit l'état initial à partir du puzzle et du programme fourni par le joueur. 
+
+Le robot est positionné sur la case de départ avec la direction indiquée par le puzzle. La pile d'exécution est initialisée avec les actions de \texttt{arrayFunct[0]}, la première fonction constitue le point d'entrée du programme. La function est reversed puis réduites en pile via \texttt{cons}, de sorte que la première action de la fonction se retrouve en tête de pile. Le board est initialisé par \texttt{boardInit} avec comme argument le puzzle.
+
+\subsubsection{Pas d'exécution}
+
+La fonction \texttt{popStateStack} constitue le cœur de l'évaluateur. Il prend un state en paramètre, prend l'action head de la stack et applique au state produisant un nouveau state. Ce processus est purement fonctionnel : aucun state n'est modifié en place.
+
+\subsubsection{Condition de fin et résultat}
+
+La fonction \texttt{isEnd} détermine si l'exécution doit s'arrêter. On distingue deux cas :
+\begin{itemize} 
+\item Victoire si toutes les étoiles ont été ramassées, (\texttt{isWin});
+\item Défaire si la pile est vide (\texttt{stackIsEmpty}), si le robot est tombé du plateau (\texttt{robotIsFell}) ou nombre d’appelle au dessu de l’autorité (\texttt{isOverStack}). 
+\end{itemize}
+
+\subsection{Exemple concret}
+
+Le fichier code.ts illustre concrètement l'écriture d'un programme pour le puzzle 330 :
+
+\begin{figure}[H]
+\centering
+\begin{lstlisting}[language=, basicstyle=\ttfamily\small, frame=single, breaklines=true, captionpos=b]
+const puzzle\_id = 330;
+
+const arrayFunct: Array<Funct> = [[
+    actionFunct(() => arrayFunct[1]),
+    actionGame(turnRight),
+    actionGame(moveForward)
+  ],
+  [
+    actionGame(moveForward),
+    actionGame(turnRight, (r) => robotColor(r) === Color.RED),
+    actionFunct(() => arrayFunct[1], (r) => robotColor(r) === Color.BLUE),
+    actionGame(moveForward)
+  ],
+  [], [], []
+];
+\end{lstlisting}
+\caption{Exemple de codage}
+\label{code:code}
+\end{figure}
+
+La fonction 0 est le point d'entrée : elle appelle la fonction 1, tourne à droite, puis avance. La fonction 1 avance, tourne à droite si la case est rouge, s'appelle récursivement si la case est bleue, puis avance. On voit ici la récursivité \texttt{actionFunct(() => arrayFunct[1])} rendue possible par l'utilisation d'un thunk \texttt{(() => arrayfunct[1])} pour éviter la référence au moment de l'initialisation, sinon nous référençons à arrayfunct[1] depuis arrayfunct[0], un tableau non encore initialisé. 
+\\
+
+Pour construire les actions, nous utilisons les constructeurs présentés précédemment. 
+\begin{itemize}
+  \item Si nous voulons faire un call :  \texttt{actionFunct(() => arrayFunct[\textit{numéro de fonction}], \textit{condition optionnel})};
+  \item Si nous voulons faire une action sur le robot : \texttt{actionGame(\textit{action de game}, \textit{condition optionnel})};
+\end{itemize}
+
+

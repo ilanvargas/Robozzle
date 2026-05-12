@@ -1,0 +1,20 @@
+\subsection{Définition}
+
+Le module \textit{board.ts} définit le type abstrait \textit{Board}, qui représente l'état du plateau de jeu. Un \textit{Board} est composé d'un tableau \texttt{.board} de squares, enrichi de deux informations supplémentaires : la case de départ du robot \texttt{.start} pointeur vers un square et le nombre d'étoiles restantes \texttt{.nbStars}. Ce dernier permet de déterminer la condition de victoire sans avoir à parcourir le plateau entier.
+
+Le tableau \texttt{board} est lu comme une matrice de squares avec en sachant la largeur du tableau : $i * puzzle_{width} + j = k$ avec $k$ l’indice dans .board. On a ainsi une représentation de matrice de squares donc un plateau.
+
+\subsection{Méthodes}
+
+La fonction \textbf{boardInit} assure la conversion d'un puzzle brut en un board exploitable. Cette conversion repose sur deux fonctions récursives internes.
+\begin{itemize}
+	\item \textbf{boardMap} qui parcours la chaîne de caractères Puzzle.board et renvoie un tableau de \textit{Square} qui associe pour chaque caractère un square. On se base sur \texttt{.map()} javascript mais pour une chaîne de caractère, on passe en argument la fonction qui crée un \textit{Square} associé à un caractère. C’est avec cette fonction qu’on crée le .board;
+	\item \textbf{boardFold} basé sur \texttt{.reduce()} pour une chaîne de caractères, on utilise la fonction qui compte +1 au accumulateur si la lettre est majuscule, représentant une case avec une étoile. On l'utilise pour calculer \texttt{nbStars}.
+\end{itemize}
+
+La fonction \textbf{removeStar} enlève l’étoile d’un square donné dans un board donné. La subtilité avec la programmation fonctionnelle est que pour changer l’état d’une variable nous devons créer une nouvelle, ainsi pour enlever l’étoile d’un square $s$ d’un board $b$, nous commençons par créer un nouveaux square $s'$ avec les mêmes attributs que $s$ à l'exeption de $s.isStar$ qui devient $false$. Puis nous créons un nouveau board $b'$ tel que $b'$.board est le tableau contenant tous les anciens squares de $b$ sauf $s$ substitué par $s'$. Finalement $nbStars_{b’} = nbStars_{b} - 1$.
+
+Nous avons une compléxité mémoire de la taille d'un square et d'une structure board (avec .board un pointeur de \textit{Square}) 
+\\
+
+Le module expose également deux opérations fondamentales : \textbf{isWin}, qui teste si la partie est gagnée ($.nbStars = 0$) et \textbf{move2square}, qui renvoie la case voisine dans une direction donnée d’un square dans un board.

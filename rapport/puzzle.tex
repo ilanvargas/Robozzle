@@ -1,0 +1,23 @@
+L’architecture de notre projet est définie par des types fondamentaux utilisés par les modules qui suivent permettant de mieux ce communiquer entre eux et construire au dessus de ces types pour former des plus complexes.
+
+\subsection{Fichier partagé puzzle}
+
+Le fichier \textit{puzzle.ts} prend le rôle d’un fichier de déclarations contenant un ensemble de constantes globales et types basiques qui servent de vocabulaire commun entre les modules.
+
+Nous y définissons la taille du plateau de jeu, les énumérations \textit{Dir} et \textit{Color} encodant respectivement les direction cardinales et couleurs des cases, le type \textit{Pos} position $x,y$, ainsi que le type \textit{Puzzle} qui reflète fidèlement la structure JSON reçue en entrée. Ce fichier sert de base sur lequel s'appuient tous les autres modules. 
+
+\subsection{Introduction de stack}
+
+Le module \textit{stack.ts} définit un type abstrait générique \textit{Stack<T>}, paramétré par le type des éléments qu'il contient. 
+
+La pile est implémentée comme une liste chaînée immuable avec une sentinelle à la fin : toute opération produit une nouvelle pile sans modifier l'existante, conformément aux principes de la programmation fonctionnelle. Le module expose les opérations classiques \textbf{cons, head, tail, stackIsEmpty}.
+
+Nous attribuons également un attribut spéciale \texttt{nb} qui contera le nombre de calls, cela sera utile pour \textit{State} et aborderons postérieurement.
+
+\subsection{Type de base square}
+
+Le module \textit{square.ts} définit le premier type abstrait du projet : \textit{Square}. Un square est caractérisée par sa couleur \texttt{.color}, sa position pos \texttt{.position} sur le plateau et la présence éventuelle d'une étoile \texttt{.isStar}. 
+
+Le module expose également une valeur sentinelle \texttt{out}, représentant l'extérieur du plateau ou une case vide, ainsi que l'opération \textbf{squareIsOut} permettant de tester ce cas limite, \texttt{squareIsOut(square) === true} si \texttt{square} est \texttt{out}. Par la suite, pour représenter la position non valide \textit{fell out of board}, nous utiliserons \texttt{out}.
+
+Square est le type fondateur de la hiérarchie, c'est à partir de lui que le plateau est construit et, avec le plateau constitué de squares uniques, un square représente un position.
