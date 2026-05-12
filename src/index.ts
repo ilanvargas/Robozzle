@@ -52,9 +52,9 @@ function removeRobot() {
 }
 
 function addRobot(aBoardID, aRobot) {
-    let aBoard = document.getElementById(aBoardID)
-    let aCell  = aBoard.rows[aRobot.x].cells[aRobot.y];
-    let anIcon = icons[Object.keys(icons)[aRobot.dir]];
+    const aBoard = document.getElementById(aBoardID);
+    const aCell  = aBoard.rows[aRobot.x].cells[aRobot.y];
+    const anIcon = icons[Object.keys(icons)[aRobot.dir]];
     aCell.id = robotID;
     aCell.innerText = anIcon.string;
     aCell.style.color = anIcon.color;
@@ -62,7 +62,7 @@ function addRobot(aBoardID, aRobot) {
 
 function addStar(aCell) {
     aCell.innerText = icons.star.string;
-    aCell.style.color = icons.star.color
+    aCell.style.color = icons.star.color;
 }
 
 function fillBoard(aBoardID, aPuzzle) {
@@ -143,7 +143,7 @@ function playUI(aBoardID) {
 
 window.onload = () => {
     const initState = m.headState();
-    let aBoardID = "visualizer_board";
+    const aBoardID = "visualizer_board";
     fillBoard(aBoardID, initState);
     addRobot(aBoardID, initState.robot);
 

@@ -1,0 +1,65 @@
+# Robozzle — Projet S6 Programmation Fonctionnelle
+
+VARGAS Ilan, HSSASSA Mohsine, DASSOULI Youssef  
+ENSEIRB-MATMECA — Bordeaux INP
+
+## Description
+
+Implémentation en TypeScript basée sur le jeu Robozzle.
+
+## Prérequis
+
+- Node.js
+- npm
+
+## Installation
+
+```bash
+npm install
+```
+
+## Utilisation
+
+### Compiler le projet
+```bash
+make build
+```
+
+### Lancer l'afficheur interactif
+```bash
+make build
+make serve
+```
+Ouvre ensuite `http://localhost:1234` dans ton navigateur.
+
+### Écrire un programme
+
+Modifie le fichier `src/code.ts` :
+- `puzzle_id` : identifiant du puzzle à résoudre
+- `arrayFunct` : tableau de 5 fonctions constituant ton programme
+
+## Tests
+
+### Tests jester
+
+```bash
+make test
+```
+
+### Tests mouvement robot visuelle
+
+```bash
+make build
+make run
+```
+
+## Autres commandes
+
+| Commande | Description |
+|----------|-------------|
+| `make build` | Compile le projet |
+| `make test` | Lance les tests Jest avec couverture |
+| `make serve` | Lance l'afficheur interactif |
+| `make setup` | Initialise le dossier public |
+| `make eslint` | Lint et corrige le code source |
+| `make clean` | Supprime les fichiers compilés |
